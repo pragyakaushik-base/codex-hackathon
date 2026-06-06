@@ -13,31 +13,52 @@
     <section class="screen screen-home is-active" data-screen="home" aria-label="Shopee home">
       <img class="shop-bg" src="shopee-app-bg.png" alt="" />
       <button class="agent-fab" type="button" data-open-agent aria-label="Open shopping agent">
-        <span class="agent-orb mini" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span class="agent-mascot fab-mascot" aria-hidden="true">
+          <span class="mascot-gloss"></span>
+          <span class="mascot-face">
+            <span></span><span></span><span></span>
+          </span>
+        </span>
       </button>
     </section>
 
-    <section class="screen agent-screen dark-theme" data-screen="listening" aria-label="Listening">
-      <header class="dark-top-bar">
-        <button class="dark-icon-button" type="button" data-go="home" aria-label="Menu">
-          <span class="icon-menu"></span>
-        </button>
-        <button class="dark-icon-button" type="button" aria-label="Screen">
-          <span class="icon-screen"></span>
-        </button>
-      </header>
-      <div class="voice-stage gemini-style">
-        <div class="agent-bubble"></div>
-        <h1>Listening...</h1>
-      </div>
-      <nav class="bottom-actions gemini-actions">
-        <button class="dark-icon-button icon-camera" type="button" data-go="camera" aria-label="Open camera"></button>
-        <button class="dark-icon-button icon-gallery" type="button" aria-label="Gallery"></button>
-        <div class="gemini-visualizer">
-          <div class="glow-core"></div>
+    <section class="screen agent-screen voice-agent-screen is-listening" data-screen="listening" aria-label="Listening">
+      <header class="agent-top-bar">
+        <strong>Shopee</strong>
+        <div class="agent-top-actions" aria-label="Shopping actions">
+          <button class="top-icon icon-cart" type="button" data-go="cart" aria-label="Open cart">
+            <span class="cart-handle"></span>
+            <span class="cart-basket"></span>
+            <span class="cart-wheel cart-wheel-left"></span>
+            <span class="cart-wheel cart-wheel-right"></span>
+          </button>
         </div>
-        <button class="dark-icon-button icon-mic-outline" type="button" data-go="camera" aria-label="Microphone"></button>
-        <button class="dark-icon-button icon-close" type="button" data-go="home" aria-label="Cancel"></button>
+      </header>
+      <div class="voice-stage shopee-voice-stage">
+        <div class="voice-aura" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <div class="side-wave side-wave-left" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="agent-mascot" aria-hidden="true">
+          <div class="mascot-gloss"></div>
+          <div class="mascot-face">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="side-wave side-wave-right" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="agent-copy">
+          <h1>Listening...</h1>
+          <p>You can speak now</p>
+        </div>
+      </div>
+      <nav class="bottom-actions shopee-actions">
+        <button class="round-action icon-close" type="button" data-go="home" aria-label="Close"></button>
+        <button class="primary-mic icon-mic" type="button" data-toggle-listening aria-label="Turn listening off"></button>
+        <button class="round-action icon-camera" type="button" data-go="camera" aria-label="Open camera"></button>
       </nav>
     </section>
 

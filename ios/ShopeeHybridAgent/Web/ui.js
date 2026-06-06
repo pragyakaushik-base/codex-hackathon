@@ -31,6 +31,7 @@ const products = [
 const screens = [...document.querySelectorAll('[data-screen]')];
 const productList = document.querySelector('.product-list');
 const cartList = document.querySelector('.cart-list');
+const voiceAgentScreen = document.querySelector('.voice-agent-screen');
 
 function postNative(event, payload = {}) {
   window.webkit?.messageHandlers?.nativeBridge?.postMessage({ event, ...payload });
@@ -40,6 +41,12 @@ function go(screenName) {
   screens.forEach((screen) => {
     screen.classList.toggle('is-active', screen.dataset.screen === screenName);
   });
+  if (screenName === 'listening') {
+    voiceAgentScreen?.classList.add('is-listening');
+    voiceAgentScreen?.classList.remove('is-speaking');
+  } else {
+    voiceAgentScreen?.classList.remove('is-speaking');
+  }
   postNative('screen_changed', { screen: screenName });
 }
 
@@ -78,6 +85,15 @@ function renderProducts() {
 }
 
 document.addEventListener('click', (event) => {
+  const micToggle = event.target.closest('[data-toggle-listening]');
+  if (micToggle) {
+    const isListening = voiceAgentScreen?.classList.toggle('is-listening');
+    voiceAgentScreen?.classList.remove('is-speaking');
+    micToggle.setAttribute('aria-label', isListening ? 'Turn listening off' : 'Turn listening on');
+    postNative(isListening ? 'agent_listening_started' : 'agent_listening_stopped');
+    return;
+  }
+
   const target = event.target.closest('[data-go], [data-open-agent]');
   if (!target) return;
   const next = target.dataset.go || 'listening';
