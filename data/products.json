@@ -11,7 +11,7 @@
     "sellerId": "S001",
     "delivery": "next_day",
     "stock": 28,
-    "imageUrl": "/assets/hw001.png",
+    "imageUrl": "assets/hw001.png",
     "attributes": {
       "size": "15mm",
       "material": "PVC",
@@ -38,7 +38,7 @@
     "sellerId": "S001",
     "delivery": "same_day",
     "stock": 96,
-    "imageUrl": "/assets/hw002.png",
+    "imageUrl": "assets/hw002.jpg",
     "attributes": {
       "length": "10m",
       "width": "12mm",
@@ -64,7 +64,7 @@
     "sellerId": "S001",
     "delivery": "same_day",
     "stock": 41,
-    "imageUrl": "/assets/hw003.png",
+    "imageUrl": "assets/hw003.jpg",
     "attributes": {
       "volume": "80ml",
       "cureTime": "30 minutes",
@@ -90,7 +90,7 @@
     "sellerId": "S001",
     "delivery": "next_day",
     "stock": 33,
-    "imageUrl": "/assets/hw004.png",
+    "imageUrl": "assets/hw004.jpg",
     "attributes": {
       "jawCapacity": "25mm",
       "handleLength": "150mm",
@@ -115,7 +115,7 @@
     "sellerId": "S002",
     "delivery": "next_day",
     "stock": 54,
-    "imageUrl": "/assets/sk001.png",
+    "imageUrl": "assets/sk001.jpg",
     "attributes": {
       "skinType": "dry_sensitive",
       "fragranceFree": true,
@@ -142,7 +142,7 @@
     "sellerId": "S002",
     "delivery": "same_day",
     "stock": 72,
-    "imageUrl": "/assets/sk002.png",
+    "imageUrl": "assets/sk002.jpg",
     "attributes": {
       "skinType": "all",
       "volume": "100ml",
@@ -169,7 +169,7 @@
     "sellerId": "S002",
     "delivery": "next_day",
     "stock": 49,
-    "imageUrl": "/assets/sk003.png",
+    "imageUrl": "assets/sk003.jpg",
     "attributes": {
       "spf": 50,
       "finish": "natural",
@@ -196,7 +196,7 @@
     "sellerId": "S002",
     "delivery": "standard",
     "stock": 61,
-    "imageUrl": "/assets/sk004.png",
+    "imageUrl": "assets/sk004.png",
     "attributes": {
       "skinType": "sensitive",
       "volume": "150ml",
@@ -223,7 +223,7 @@
     "sellerId": "S003",
     "delivery": "next_day",
     "stock": 38,
-    "imageUrl": "/assets/fa001.png",
+    "imageUrl": "assets/fa001.png",
     "attributes": {
       "color": "dark indigo",
       "fit": "straight",
@@ -249,7 +249,7 @@
     "sellerId": "S003",
     "delivery": "same_day",
     "stock": 45,
-    "imageUrl": "/assets/fa002.png",
+    "imageUrl": "assets/fa002.png",
     "attributes": {
       "color": "black",
       "material": "genuine leather",
@@ -275,7 +275,7 @@
     "sellerId": "S003",
     "delivery": "next_day",
     "stock": 31,
-    "imageUrl": "/assets/fa003.png",
+    "imageUrl": "assets/fa003.png",
     "attributes": {
       "color": "charcoal",
       "fit": "tapered",
@@ -301,7 +301,7 @@
     "sellerId": "S003",
     "delivery": "standard",
     "stock": 80,
-    "imageUrl": "/assets/fa004.png",
+    "imageUrl": "assets/fa004.png",
     "attributes": {
       "color": "white",
       "fit": "regular",
@@ -327,7 +327,7 @@
     "sellerId": "S004",
     "delivery": "same_day",
     "stock": 63,
-    "imageUrl": "/assets/el001.png",
+    "imageUrl": "assets/el001.png",
     "attributes": {
       "wattage": "30W",
       "ports": ["USB-C"],
@@ -353,7 +353,7 @@
     "sellerId": "S004",
     "delivery": "same_day",
     "stock": 120,
-    "imageUrl": "/assets/el002.png",
+    "imageUrl": "assets/el002.png",
     "attributes": {
       "length": "1m",
       "power": "60W",
@@ -379,7 +379,7 @@
     "sellerId": "S004",
     "delivery": "next_day",
     "stock": 37,
-    "imageUrl": "/assets/el003.png",
+    "imageUrl": "assets/el003.png",
     "attributes": {
       "plug": "Type G",
       "connectivity": "2.4GHz Wi-Fi",
@@ -405,7 +405,7 @@
     "sellerId": "S004",
     "delivery": "standard",
     "stock": 58,
-    "imageUrl": "/assets/el004.png",
+    "imageUrl": "assets/el004.png",
     "attributes": {
       "battery": "CR2032 replaceable",
       "range": "40m",
@@ -430,7 +430,7 @@
     "sellerId": "S005",
     "delivery": "same_day",
     "stock": 82,
-    "imageUrl": "/assets/gr001.png",
+    "imageUrl": "assets/gr001.png",
     "attributes": {
       "volume": "1L",
       "diet": ["dairy_free", "vegan"],
@@ -455,7 +455,7 @@
     "sellerId": "S005",
     "delivery": "same_day",
     "stock": 44,
-    "imageUrl": "/assets/gr002.png",
+    "imageUrl": "assets/gr002.png",
     "attributes": {
       "weight": "250g",
       "roast": "medium",
@@ -481,7 +481,7 @@
     "sellerId": "S005",
     "delivery": "next_day",
     "stock": 77,
-    "imageUrl": "/assets/gr003.png",
+    "imageUrl": "assets/gr003.png",
     "attributes": {
       "volume": "800ml",
       "scent": "citrus",
@@ -506,7 +506,7 @@
     "sellerId": "S005",
     "delivery": "standard",
     "stock": 66,
-    "imageUrl": "/assets/gr004.png",
+    "imageUrl": "assets/gr004.png",
     "attributes": {
       "weight": "1kg",
       "cookTime": "15 minutes",
@@ -531,7 +531,7 @@
     "sellerId": "S006",
     "delivery": "next_day",
     "stock": 29,
-    "imageUrl": "/assets/hd001.png",
+    "imageUrl": "assets/hd001.png",
     "attributes": {
       "colorTemperature": "2700K-4000K",
       "dimmable": true,
@@ -557,7 +557,7 @@
     "sellerId": "S006",
     "delivery": "same_day",
     "stock": 74,
-    "imageUrl": "/assets/hd002.png",
+    "imageUrl": "assets/hd002.png",
     "attributes": {
       "size": "32x24x18cm",
       "material": "polyester fabric",
@@ -583,7 +583,7 @@
     "sellerId": "S006",
     "delivery": "standard",
     "stock": 16,
-    "imageUrl": "/assets/hd003.png",
+    "imageUrl": "assets/hd003.png",
     "attributes": {
       "size": "42x42x50cm",
       "material": "engineered wood and rattan",
@@ -609,7 +609,7 @@
     "sellerId": "S006",
     "delivery": "same_day",
     "stock": 100,
-    "imageUrl": "/assets/hd004.png",
+    "imageUrl": "assets/hd004.png",
     "attributes": {
       "packSize": 6,
       "maxLoad": "2kg",
