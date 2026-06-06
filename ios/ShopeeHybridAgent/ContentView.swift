@@ -26,6 +26,15 @@ struct ContentView: View {
 
                     Spacer()
 
+                    Button("Analyze view") {
+                        viewModel.requestCameraAnalysis()
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(.orange.opacity(0.88), in: Capsule())
+
                     Button("Back to shop") {
                         viewModel.showingWebOverlay = true
                     }

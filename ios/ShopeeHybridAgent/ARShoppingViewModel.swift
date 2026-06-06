@@ -45,6 +45,7 @@ struct WebAgentState: Encodable, Equatable {
     let sceneStatus: String
     let planeDetected: Bool
     let selectedProductID: String?
+    let visionCaptureRequest: Int
     let recommendations: [ProductSnapshot]
     let cart: [ProductSnapshot]
 }
@@ -89,6 +90,7 @@ final class ARShoppingViewModel: ObservableObject {
     @Published var showingAgent = true
     @Published var showingWebOverlay = true
     @Published var activeSetup: SpatialSetupPlan?
+    @Published var visionCaptureRequest = 0
 
     init() {
         loadCatalog()
@@ -113,6 +115,7 @@ final class ARShoppingViewModel: ObservableObject {
             sceneStatus: sceneStatus,
             planeDetected: planeDetected,
             selectedProductID: selectedProductID,
+            visionCaptureRequest: visionCaptureRequest,
             recommendations: recommendations.map(Self.snapshot(for:)),
             cart: cart.map { Self.snapshot(for: $0.product) }
         )
@@ -231,6 +234,13 @@ final class ARShoppingViewModel: ObservableObject {
             return
         }
         placementVersion += 1
+    }
+
+    func requestCameraAnalysis() {
+        sceneStatus = "Capturing the camera view for visual product matching."
+        showingWebOverlay = true
+        showingAgent = true
+        visionCaptureRequest += 1
     }
 
     func applySpatialSetup(_ setup: SpatialSetupPlan) {

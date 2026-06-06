@@ -8,6 +8,7 @@ let voiceStartToken = 0;
 const handledRealtimeCalls = new Set();
 const injectedApiBase = window.__AGENT_BASE_URL || '';
 const API_BASE = injectedApiBase || (location.protocol === 'file:' ? 'http://127.0.0.1:3000' : '');
+let lastNativeVisionCaptureRequest = 0;
 
 const screens = [...document.querySelectorAll('[data-screen]')];
 const productList = document.querySelector('.product-list');
@@ -283,6 +284,12 @@ document.addEventListener('click', (event) => {
     return;
   }
 
+  const cameraCaptureTarget = event.target.closest('[data-camera-capture]');
+  if (cameraCaptureTarget) {
+    runCameraAnalysis();
+    return;
+  }
+
   const openCheckoutTarget = event.target.closest('[data-open-checkout]');
   if (openCheckoutTarget) {
     openCheckout();
@@ -306,6 +313,10 @@ document.addEventListener('click', (event) => {
 });
 
 window.syncNativeState = function syncNativeState(nextState = {}) {
+  const visionCaptureRequest = Number(nextState.visionCaptureRequest || 0);
+  const shouldRunVisionCapture = visionCaptureRequest > lastNativeVisionCaptureRequest;
+  if (shouldRunVisionCapture) lastNativeVisionCaptureRequest = visionCaptureRequest;
+
   if (Array.isArray(nextState.recommendations) && nextState.recommendations.length) {
     products = nextState.recommendations.map((product) => ({
       ...product,
@@ -329,12 +340,67 @@ window.syncNativeState = function syncNativeState(nextState = {}) {
 
   renderProducts();
 
+  if (shouldRunVisionCapture) {
+    runCameraAnalysis({ question: 'Identify the visible items and recommend matching products.' });
+    return;
+  }
+
   if (Array.isArray(nextState.recommendations) && nextState.recommendations.length) {
     go('suggestions', { autoStartVoice: false });
   } else if (Array.isArray(nextState.cart) && nextState.cart.length) {
     go('cart', { autoStartVoice: false });
   }
 };
+
+async function runCameraAnalysis(options = {}) {
+  const args = {
+    userId: 'u_001',
+    question: options.question || 'Identify the visible items and recommend matching Shopee products.'
+  };
+
+  resetActivity();
+  go('thinking');
+  setToolActivity('analyze_surroundings', 'active');
+
+  try {
+    await enrichSurroundingsArgs(args);
+    const visionResponse = await postJson('/api/realtime-tool', {
+      name: 'analyze_surroundings',
+      arguments: args
+    });
+    const visionResult = visionResponse.result || {};
+    setToolActivity('analyze_surroundings', 'done');
+    await applyToolResult('analyze_surroundings', visionResult);
+
+    const query = [
+      visionResult.searchQuery,
+      ...(visionResult.suggestedSearchTerms || [])
+    ].filter(Boolean).join(' ');
+
+    if (!query) {
+      setVoiceStatus(visionResult.summary || 'I captured the view, but could not identify a matching shopping query.');
+      return;
+    }
+
+    setToolActivity('search_catalog', 'active');
+    const searchResponse = await postJson('/api/realtime-tool', {
+      name: 'search_catalog',
+      arguments: {
+        userId: 'u_001',
+        query,
+        category: visionResult.possibleCategory || null,
+        limit: 8
+      }
+    });
+    setToolActivity('search_catalog', 'done');
+    await applyToolResult('search_catalog', searchResponse.result || {});
+  } catch (error) {
+    setToolActivity('analyze_surroundings', 'idle');
+    setToolActivity('search_catalog', 'idle');
+    setVoiceStatus(`Camera analysis failed: ${voiceErrorMessage(error)}`);
+    go('listening');
+  }
+}
 
 async function bootstrap() {
   try {
