@@ -1,0 +1,79 @@
+[
+  {
+    "id": "V001",
+    "code": "FREESHIP",
+    "description": "Free shipping on orders above $10",
+    "discountType": "free_shipping",
+    "value": 2.99,
+    "minSpend": 10,
+    "category": null,
+    "stackable": true,
+    "priority": 80
+  },
+  {
+    "id": "V002",
+    "code": "REPAIR10",
+    "description": "10% off repair essentials above $10",
+    "discountType": "percent",
+    "value": 10,
+    "minSpend": 10,
+    "category": "home_repair",
+    "stackable": false,
+    "priority": 90
+  },
+  {
+    "id": "V003",
+    "code": "BEAUTY5",
+    "description": "$5 off skincare orders above $25",
+    "discountType": "fixed",
+    "value": 5,
+    "minSpend": 25,
+    "category": "beauty",
+    "stackable": false,
+    "priority": 70
+  },
+  {
+    "id": "V004",
+    "code": "STYLE12",
+    "description": "12% off fashion bundles above $40",
+    "discountType": "percent",
+    "value": 12,
+    "minSpend": 40,
+    "category": "fashion",
+    "stackable": false,
+    "priority": 65
+  },
+  {
+    "id": "V005",
+    "code": "TECH8",
+    "description": "8% off electronics above $20",
+    "discountType": "percent",
+    "value": 8,
+    "minSpend": 20,
+    "category": "electronics",
+    "stackable": false,
+    "priority": 60
+  },
+  {
+    "id": "V006",
+    "code": "PANTRY3",
+    "description": "$3 off grocery orders above $18",
+    "discountType": "fixed",
+    "value": 3,
+    "minSpend": 18,
+    "category": "grocery",
+    "stackable": false,
+    "priority": 55
+  },
+  {
+    "id": "V007",
+    "code": "HOME15",
+    "description": "15% off home decor above $45",
+    "discountType": "percent",
+    "value": 15,
+    "minSpend": 45,
+    "category": "home_decor",
+    "stackable": false,
+    "priority": 50
+  }
+]

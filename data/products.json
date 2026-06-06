@@ -1,0 +1,625 @@
+[
+  {
+    "id": "HW001",
+    "title": "15mm PVC Slip Coupling",
+    "category": "home_repair",
+    "description": "Replacement coupling for small PVC pipe repairs under sinks and basins.",
+    "keywords": ["sink", "pipe", "leak", "pvc", "coupling", "repair", "15mm", "plumbing"],
+    "price": 4.2,
+    "rating": 4.8,
+    "reviewCount": 512,
+    "sellerId": "S001",
+    "delivery": "next_day",
+    "stock": 28,
+    "imageUrl": "/assets/hw001.png",
+    "attributes": {
+      "size": "15mm",
+      "material": "PVC",
+      "fit": "slip",
+      "waterproof": true
+    },
+    "bestFor": ["Replacing cracked coupling", "Low-pressure drain pipe leak"],
+    "tradeoffs": ["Requires matching pipe diameter", "Needs sealant tape for best fit"],
+    "compatibility": {
+      "pipeSizesMm": [15],
+      "worksWith": ["HW002", "HW003"]
+    },
+    "bundleItems": ["HW002", "HW003"]
+  },
+  {
+    "id": "HW002",
+    "title": "PTFE Teflon Seal Tape",
+    "category": "home_repair",
+    "description": "Thread seal tape for reducing minor leaks around pipe joints and fittings.",
+    "keywords": ["teflon", "seal tape", "ptfe", "thread", "pipe", "leak", "plumbing"],
+    "price": 1.2,
+    "rating": 4.7,
+    "reviewCount": 342,
+    "sellerId": "S001",
+    "delivery": "same_day",
+    "stock": 96,
+    "imageUrl": "/assets/hw002.png",
+    "attributes": {
+      "length": "10m",
+      "width": "12mm",
+      "material": "PTFE",
+      "waterproof": true
+    },
+    "bestFor": ["Threaded fittings", "Cheap add-on for leak repair"],
+    "tradeoffs": ["Not a permanent fix for cracked plastic", "Needs clean dry threads"],
+    "compatibility": {
+      "worksWith": ["HW001", "HW003", "HW004"]
+    },
+    "bundleItems": ["HW001", "HW003"]
+  },
+  {
+    "id": "HW003",
+    "title": "Waterproof Pipe Sealant",
+    "category": "home_repair",
+    "description": "Fast-curing waterproof sealant for small gaps around bathroom and kitchen plumbing.",
+    "keywords": ["waterproof", "sealant", "pipe", "bathroom", "sink", "leak", "repair"],
+    "price": 6.8,
+    "rating": 4.6,
+    "reviewCount": 198,
+    "sellerId": "S001",
+    "delivery": "same_day",
+    "stock": 41,
+    "imageUrl": "/assets/hw003.png",
+    "attributes": {
+      "volume": "80ml",
+      "cureTime": "30 minutes",
+      "finish": "clear",
+      "waterproof": true
+    },
+    "bestFor": ["Sealing minor gaps", "Temporary leak control before replacement"],
+    "tradeoffs": ["Messier than tape", "Not suitable for high-pressure pipe bursts"],
+    "compatibility": {
+      "worksWith": ["HW001", "HW002"]
+    },
+    "bundleItems": ["HW001", "HW002"]
+  },
+  {
+    "id": "HW004",
+    "title": "Adjustable Mini Pipe Wrench",
+    "category": "home_repair",
+    "description": "Compact wrench for tightening sink fittings in narrow cabinet spaces.",
+    "keywords": ["wrench", "tool", "pipe", "sink", "tighten", "repair", "plumbing"],
+    "price": 8.9,
+    "rating": 4.5,
+    "reviewCount": 126,
+    "sellerId": "S001",
+    "delivery": "next_day",
+    "stock": 33,
+    "imageUrl": "/assets/hw004.png",
+    "attributes": {
+      "jawCapacity": "25mm",
+      "handleLength": "150mm",
+      "material": "carbon steel"
+    },
+    "bestFor": ["Tight cabinet spaces", "Installing replacement fittings"],
+    "tradeoffs": ["Not needed if user already owns pliers", "Small handle limits torque"],
+    "compatibility": {
+      "worksWith": ["HW001", "HW002"]
+    },
+    "bundleItems": ["HW001", "HW002"]
+  },
+  {
+    "id": "SK001",
+    "title": "Barrier Repair Moisturizer",
+    "category": "beauty",
+    "description": "Fragrance-free moisturizer for dry or sensitive skin barrier support.",
+    "keywords": ["moisturizer", "dry skin", "barrier", "sensitive", "fragrance free", "skincare"],
+    "price": 12.9,
+    "rating": 4.8,
+    "reviewCount": 680,
+    "sellerId": "S002",
+    "delivery": "next_day",
+    "stock": 54,
+    "imageUrl": "/assets/sk001.png",
+    "attributes": {
+      "skinType": "dry_sensitive",
+      "fragranceFree": true,
+      "volume": "50ml",
+      "keyIngredients": ["ceramide", "panthenol"]
+    },
+    "bestFor": ["Dry patches", "Post-cleanser skin tightness", "Low-risk skincare reorder"],
+    "tradeoffs": ["Not mattifying", "May feel rich in humid weather"],
+    "compatibility": {
+      "routineStep": "moisturizer",
+      "worksWith": ["SK002", "SK003"]
+    },
+    "bundleItems": ["SK002", "SK003"]
+  },
+  {
+    "id": "SK002",
+    "title": "Hydrating Facial Mist",
+    "category": "beauty",
+    "description": "Light mist for refreshing skin during hot commutes or after makeup.",
+    "keywords": ["mist", "hydrating", "refresh", "makeup", "skincare", "commute"],
+    "price": 7.5,
+    "rating": 4.6,
+    "reviewCount": 251,
+    "sellerId": "S002",
+    "delivery": "same_day",
+    "stock": 72,
+    "imageUrl": "/assets/sk002.png",
+    "attributes": {
+      "skinType": "all",
+      "volume": "100ml",
+      "keyIngredients": ["hyaluronic acid", "aloe"],
+      "fragranceFree": false
+    },
+    "bestFor": ["Midday refresh", "Layering under moisturizer"],
+    "tradeoffs": ["Hydration is temporary", "Contains light fragrance"],
+    "compatibility": {
+      "routineStep": "treatment",
+      "worksWith": ["SK001", "SK003"]
+    },
+    "bundleItems": ["SK001"]
+  },
+  {
+    "id": "SK003",
+    "title": "Daily SPF50 Sunscreen Gel",
+    "category": "beauty",
+    "description": "Lightweight SPF50 gel sunscreen for daily city use in humid weather.",
+    "keywords": ["sunscreen", "spf50", "gel", "daily", "uv", "humid", "skincare"],
+    "price": 13.8,
+    "rating": 4.7,
+    "reviewCount": 438,
+    "sellerId": "S002",
+    "delivery": "next_day",
+    "stock": 49,
+    "imageUrl": "/assets/sk003.png",
+    "attributes": {
+      "spf": 50,
+      "finish": "natural",
+      "skinType": "combination",
+      "waterResistant": false
+    },
+    "bestFor": ["Daily UV protection", "Light feel under makeup"],
+    "tradeoffs": ["Not water-resistant for sports", "Needs reapplication"],
+    "compatibility": {
+      "routineStep": "sunscreen",
+      "worksWith": ["SK001", "SK002"]
+    },
+    "bundleItems": ["SK001"]
+  },
+  {
+    "id": "SK004",
+    "title": "Low-pH Gentle Cleanser",
+    "category": "beauty",
+    "description": "Mild daily cleanser for sensitive skin and evening routines.",
+    "keywords": ["cleanser", "low ph", "sensitive", "face wash", "gentle", "skincare"],
+    "price": 9.4,
+    "rating": 4.5,
+    "reviewCount": 303,
+    "sellerId": "S002",
+    "delivery": "standard",
+    "stock": 61,
+    "imageUrl": "/assets/sk004.png",
+    "attributes": {
+      "skinType": "sensitive",
+      "volume": "150ml",
+      "fragranceFree": true,
+      "ph": "5.5"
+    },
+    "bestFor": ["First skincare step", "Avoiding tight feeling after wash"],
+    "tradeoffs": ["Not a strong makeup remover", "Foams lightly"],
+    "compatibility": {
+      "routineStep": "cleanser",
+      "worksWith": ["SK001", "SK003"]
+    },
+    "bundleItems": ["SK001", "SK003"]
+  },
+  {
+    "id": "FA001",
+    "title": "Straight Dark Denim Jeans",
+    "category": "fashion",
+    "description": "Dark straight-leg denim suitable for casual Fridays and weekend outfits.",
+    "keywords": ["jeans", "dark denim", "straight", "casual", "fashion", "pants"],
+    "price": 29.9,
+    "rating": 4.6,
+    "reviewCount": 221,
+    "sellerId": "S003",
+    "delivery": "next_day",
+    "stock": 38,
+    "imageUrl": "/assets/fa001.png",
+    "attributes": {
+      "color": "dark indigo",
+      "fit": "straight",
+      "sizes": ["S", "M", "L", "XL"],
+      "material": "cotton blend"
+    },
+    "bestFor": ["Smart casual outfit", "Pairing with black belt"],
+    "tradeoffs": ["Less stretch than jogger denim", "May need hemming"],
+    "compatibility": {
+      "worksWith": ["FA002", "FA003"]
+    },
+    "bundleItems": ["FA002", "FA003"]
+  },
+  {
+    "id": "FA002",
+    "title": "Minimal Black Leather Belt",
+    "category": "fashion",
+    "description": "Simple black belt with brushed metal buckle for work and casual styling.",
+    "keywords": ["belt", "black", "leather", "workwear", "fashion", "accessory"],
+    "price": 14.5,
+    "rating": 4.7,
+    "reviewCount": 184,
+    "sellerId": "S003",
+    "delivery": "same_day",
+    "stock": 45,
+    "imageUrl": "/assets/fa002.png",
+    "attributes": {
+      "color": "black",
+      "material": "genuine leather",
+      "buckle": "brushed metal",
+      "sizes": ["M", "L", "XL"]
+    },
+    "bestFor": ["Completing denim outfit", "Office-ready basic"],
+    "tradeoffs": ["Only one buckle color", "Check waist measurement"],
+    "compatibility": {
+      "worksWith": ["FA001", "FA003"]
+    },
+    "bundleItems": ["FA001"]
+  },
+  {
+    "id": "FA003",
+    "title": "Tailored Ankle Pants",
+    "category": "fashion",
+    "description": "Tapered ankle pants for a clean office look with breathable stretch fabric.",
+    "keywords": ["tailored pants", "office", "ankle", "fashion", "workwear", "smart casual"],
+    "price": 24.9,
+    "rating": 4.5,
+    "reviewCount": 199,
+    "sellerId": "S003",
+    "delivery": "next_day",
+    "stock": 31,
+    "imageUrl": "/assets/fa003.png",
+    "attributes": {
+      "color": "charcoal",
+      "fit": "tapered",
+      "sizes": ["S", "M", "L"],
+      "material": "polyester rayon stretch"
+    },
+    "bestFor": ["Office outfits", "Warmer Singapore commute"],
+    "tradeoffs": ["Less casual than denim", "Wrinkle-resistant but not wrinkle-proof"],
+    "compatibility": {
+      "worksWith": ["FA002"]
+    },
+    "bundleItems": ["FA002"]
+  },
+  {
+    "id": "FA004",
+    "title": "White Ribbed Basic Tee",
+    "category": "fashion",
+    "description": "Breathable white ribbed tee that layers under overshirts and jackets.",
+    "keywords": ["white tee", "basic", "ribbed", "fashion", "casual", "layering"],
+    "price": 10.9,
+    "rating": 4.4,
+    "reviewCount": 143,
+    "sellerId": "S003",
+    "delivery": "standard",
+    "stock": 80,
+    "imageUrl": "/assets/fa004.png",
+    "attributes": {
+      "color": "white",
+      "fit": "regular",
+      "sizes": ["XS", "S", "M", "L", "XL"],
+      "material": "cotton rib"
+    },
+    "bestFor": ["Capsule wardrobe", "Layering with dark denim"],
+    "tradeoffs": ["White fabric may need careful washing", "Casual only"],
+    "compatibility": {
+      "worksWith": ["FA001", "FA002"]
+    },
+    "bundleItems": ["FA001"]
+  },
+  {
+    "id": "EL001",
+    "title": "USB-C 30W Fast Charger",
+    "category": "electronics",
+    "description": "Compact GaN wall charger for phones, tablets, and small USB-C devices.",
+    "keywords": ["charger", "usb-c", "gan", "fast charge", "phone", "electronics"],
+    "price": 18.9,
+    "rating": 4.8,
+    "reviewCount": 710,
+    "sellerId": "S004",
+    "delivery": "same_day",
+    "stock": 63,
+    "imageUrl": "/assets/el001.png",
+    "attributes": {
+      "wattage": "30W",
+      "ports": ["USB-C"],
+      "standard": "PD 3.0",
+      "plug": "Type G"
+    },
+    "bestFor": ["Phone fast charging", "Travel bag charger"],
+    "tradeoffs": ["Single port only", "Cable not included"],
+    "compatibility": {
+      "worksWith": ["EL002", "EL003"]
+    },
+    "bundleItems": ["EL002"]
+  },
+  {
+    "id": "EL002",
+    "title": "Braided USB-C Cable 1m",
+    "category": "electronics",
+    "description": "Durable 60W USB-C to USB-C cable for charging and basic data transfer.",
+    "keywords": ["usb-c", "cable", "braided", "charging", "electronics", "60w"],
+    "price": 6.9,
+    "rating": 4.7,
+    "reviewCount": 522,
+    "sellerId": "S004",
+    "delivery": "same_day",
+    "stock": 120,
+    "imageUrl": "/assets/el002.png",
+    "attributes": {
+      "length": "1m",
+      "power": "60W",
+      "connector": "USB-C to USB-C",
+      "material": "braided nylon"
+    },
+    "bestFor": ["Pairing with fast charger", "Daily desk charging"],
+    "tradeoffs": ["1m may be short for sofa use", "Not Thunderbolt speed"],
+    "compatibility": {
+      "worksWith": ["EL001"]
+    },
+    "bundleItems": ["EL001"]
+  },
+  {
+    "id": "EL003",
+    "title": "Smart Plug with Energy Monitor",
+    "category": "electronics",
+    "description": "Wi-Fi smart plug with app scheduling and basic power usage tracking.",
+    "keywords": ["smart plug", "energy monitor", "wifi", "smart home", "electronics"],
+    "price": 16.5,
+    "rating": 4.5,
+    "reviewCount": 214,
+    "sellerId": "S004",
+    "delivery": "next_day",
+    "stock": 37,
+    "imageUrl": "/assets/el003.png",
+    "attributes": {
+      "plug": "Type G",
+      "connectivity": "2.4GHz Wi-Fi",
+      "voiceAssistant": ["Alexa", "Google Home"],
+      "maxLoad": "13A"
+    },
+    "bestFor": ["Lamp automation", "Monitoring standby power"],
+    "tradeoffs": ["Requires 2.4GHz Wi-Fi", "Not for high-powered appliances above rating"],
+    "compatibility": {
+      "worksWith": ["HD003"]
+    },
+    "bundleItems": ["HD003"]
+  },
+  {
+    "id": "EL004",
+    "title": "Bluetooth Item Tracker Tag",
+    "category": "electronics",
+    "description": "Small tracker tag for keys, bags, and everyday carry items.",
+    "keywords": ["tracker", "bluetooth", "keys", "bag", "lost item", "electronics"],
+    "price": 11.9,
+    "rating": 4.3,
+    "reviewCount": 167,
+    "sellerId": "S004",
+    "delivery": "standard",
+    "stock": 58,
+    "imageUrl": "/assets/el004.png",
+    "attributes": {
+      "battery": "CR2032 replaceable",
+      "range": "40m",
+      "waterResistant": true
+    },
+    "bestFor": ["Keys", "Backpacks", "Travel pouches"],
+    "tradeoffs": ["Bluetooth range only", "Requires companion app"],
+    "compatibility": {
+      "worksWith": []
+    },
+    "bundleItems": []
+  },
+  {
+    "id": "GR001",
+    "title": "Oat Milk Barista Pack",
+    "category": "grocery",
+    "description": "Shelf-stable oat milk that froths well for coffee and tea.",
+    "keywords": ["oat milk", "barista", "coffee", "grocery", "milk alternative"],
+    "price": 5.6,
+    "rating": 4.7,
+    "reviewCount": 390,
+    "sellerId": "S005",
+    "delivery": "same_day",
+    "stock": 82,
+    "imageUrl": "/assets/gr001.png",
+    "attributes": {
+      "volume": "1L",
+      "diet": ["dairy_free", "vegan"],
+      "shelfStable": true
+    },
+    "bestFor": ["Coffee at home", "Dairy-free grocery reorder"],
+    "tradeoffs": ["Higher cost than dairy milk", "Check sweetness preference"],
+    "compatibility": {
+      "worksWith": ["GR002"]
+    },
+    "bundleItems": ["GR002"]
+  },
+  {
+    "id": "GR002",
+    "title": "Medium Roast Coffee Beans",
+    "category": "grocery",
+    "description": "Balanced medium roast beans with chocolate and nutty notes.",
+    "keywords": ["coffee", "beans", "medium roast", "breakfast", "grocery"],
+    "price": 12.4,
+    "rating": 4.6,
+    "reviewCount": 275,
+    "sellerId": "S005",
+    "delivery": "same_day",
+    "stock": 44,
+    "imageUrl": "/assets/gr002.png",
+    "attributes": {
+      "weight": "250g",
+      "roast": "medium",
+      "grind": "whole bean",
+      "origin": "blend"
+    },
+    "bestFor": ["Daily coffee routine", "Pairing with oat milk"],
+    "tradeoffs": ["Needs grinder", "Not ideal for dark roast fans"],
+    "compatibility": {
+      "worksWith": ["GR001"]
+    },
+    "bundleItems": ["GR001"]
+  },
+  {
+    "id": "GR003",
+    "title": "Eco Dishwashing Liquid Refill",
+    "category": "grocery",
+    "description": "Plant-based dishwashing liquid refill pouch for daily kitchen cleanup.",
+    "keywords": ["dishwashing", "liquid", "refill", "kitchen", "grocery", "household"],
+    "price": 4.8,
+    "rating": 4.5,
+    "reviewCount": 188,
+    "sellerId": "S005",
+    "delivery": "next_day",
+    "stock": 77,
+    "imageUrl": "/assets/gr003.png",
+    "attributes": {
+      "volume": "800ml",
+      "scent": "citrus",
+      "refill": true
+    },
+    "bestFor": ["Routine household replenishment", "Reducing plastic bottles"],
+    "tradeoffs": ["Needs existing pump bottle", "Citrus scent may not suit everyone"],
+    "compatibility": {
+      "worksWith": []
+    },
+    "bundleItems": []
+  },
+  {
+    "id": "GR004",
+    "title": "Quick Cook Brown Rice",
+    "category": "grocery",
+    "description": "Pre-washed quick cook brown rice for weekday meals.",
+    "keywords": ["brown rice", "quick cook", "meal prep", "grocery", "pantry"],
+    "price": 6.2,
+    "rating": 4.4,
+    "reviewCount": 142,
+    "sellerId": "S005",
+    "delivery": "standard",
+    "stock": 66,
+    "imageUrl": "/assets/gr004.png",
+    "attributes": {
+      "weight": "1kg",
+      "cookTime": "15 minutes",
+      "diet": ["whole_grain"]
+    },
+    "bestFor": ["Weekday meal prep", "Pantry restock"],
+    "tradeoffs": ["Less aromatic than jasmine rice", "Texture is firmer"],
+    "compatibility": {
+      "worksWith": []
+    },
+    "bundleItems": []
+  },
+  {
+    "id": "HD001",
+    "title": "Warm LED Desk Lamp",
+    "category": "home_decor",
+    "description": "Minimal desk lamp with warm dimmable light for bedrooms and study corners.",
+    "keywords": ["lamp", "desk", "warm light", "home decor", "study", "bedroom"],
+    "price": 22.9,
+    "rating": 4.7,
+    "reviewCount": 266,
+    "sellerId": "S006",
+    "delivery": "next_day",
+    "stock": 29,
+    "imageUrl": "/assets/hd001.png",
+    "attributes": {
+      "colorTemperature": "2700K-4000K",
+      "dimmable": true,
+      "power": "USB-C",
+      "finish": "matte white"
+    },
+    "bestFor": ["Bedside reading", "Small desk lighting"],
+    "tradeoffs": ["Not bright enough for large rooms", "Adapter not included"],
+    "compatibility": {
+      "worksWith": ["EL001", "EL003"]
+    },
+    "bundleItems": ["EL003"]
+  },
+  {
+    "id": "HD002",
+    "title": "Stackable Fabric Storage Box",
+    "category": "home_decor",
+    "description": "Foldable storage box for wardrobes, shelves, and small apartment organization.",
+    "keywords": ["storage", "box", "fabric", "wardrobe", "home decor", "organization"],
+    "price": 8.5,
+    "rating": 4.6,
+    "reviewCount": 319,
+    "sellerId": "S006",
+    "delivery": "same_day",
+    "stock": 74,
+    "imageUrl": "/assets/hd002.png",
+    "attributes": {
+      "size": "32x24x18cm",
+      "material": "polyester fabric",
+      "color": "light grey",
+      "foldable": true
+    },
+    "bestFor": ["Wardrobe organization", "Rental home storage"],
+    "tradeoffs": ["Not waterproof", "Soft sides limit heavy items"],
+    "compatibility": {
+      "worksWith": []
+    },
+    "bundleItems": []
+  },
+  {
+    "id": "HD003",
+    "title": "Rattan Accent Table",
+    "category": "home_decor",
+    "description": "Compact side table with rattan shelf for sofa corners and bedside use.",
+    "keywords": ["rattan", "side table", "accent table", "home decor", "bedside"],
+    "price": 39.9,
+    "rating": 4.5,
+    "reviewCount": 118,
+    "sellerId": "S006",
+    "delivery": "standard",
+    "stock": 16,
+    "imageUrl": "/assets/hd003.png",
+    "attributes": {
+      "size": "42x42x50cm",
+      "material": "engineered wood and rattan",
+      "color": "oak",
+      "assemblyRequired": true
+    },
+    "bestFor": ["Small living rooms", "Bedside styling"],
+    "tradeoffs": ["Requires assembly", "Standard delivery only"],
+    "compatibility": {
+      "worksWith": ["HD001"]
+    },
+    "bundleItems": ["HD001"]
+  },
+  {
+    "id": "HD004",
+    "title": "Peel-and-Stick Wall Hooks",
+    "category": "home_decor",
+    "description": "Damage-free adhesive hooks for keys, towels, and light accessories.",
+    "keywords": ["hooks", "adhesive", "rental", "wall", "home decor", "organization"],
+    "price": 3.9,
+    "rating": 4.4,
+    "reviewCount": 203,
+    "sellerId": "S006",
+    "delivery": "same_day",
+    "stock": 100,
+    "imageUrl": "/assets/hd004.png",
+    "attributes": {
+      "packSize": 6,
+      "maxLoad": "2kg",
+      "surface": ["tile", "glass", "painted wall"]
+    },
+    "bestFor": ["Rental-friendly organization", "Bathroom towels"],
+    "tradeoffs": ["Load limit is modest", "Surface must be clean and dry"],
+    "compatibility": {
+      "worksWith": ["HD002"]
+    },
+    "bundleItems": ["HD002"]
+  }
+]

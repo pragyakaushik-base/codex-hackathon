@@ -1,0 +1,68 @@
+[
+  {
+    "id": "S001",
+    "name": "SG Hardware Pro",
+    "rating": 4.9,
+    "isPreferred": true,
+    "location": "Singapore",
+    "fulfillment": "Shopee Express",
+    "responseRate": 0.98,
+    "returnWindowDays": 15,
+    "specialties": ["home_repair", "plumbing", "tools"]
+  },
+  {
+    "id": "S002",
+    "name": "GlowLab Official",
+    "rating": 4.8,
+    "isPreferred": true,
+    "location": "Singapore",
+    "fulfillment": "Shopee Express",
+    "responseRate": 0.96,
+    "returnWindowDays": 15,
+    "specialties": ["beauty", "skincare"]
+  },
+  {
+    "id": "S003",
+    "name": "UrbanFit Wardrobe",
+    "rating": 4.7,
+    "isPreferred": true,
+    "location": "Singapore",
+    "fulfillment": "Seller Fleet",
+    "responseRate": 0.93,
+    "returnWindowDays": 7,
+    "specialties": ["fashion", "workwear"]
+  },
+  {
+    "id": "S004",
+    "name": "TechNest SG",
+    "rating": 4.8,
+    "isPreferred": true,
+    "location": "Singapore",
+    "fulfillment": "Shopee Express",
+    "responseRate": 0.97,
+    "returnWindowDays": 15,
+    "specialties": ["electronics", "smart_home"]
+  },
+  {
+    "id": "S005",
+    "name": "DailyMart Fresh",
+    "rating": 4.6,
+    "isPreferred": false,
+    "location": "Singapore",
+    "fulfillment": "Same Day Fresh",
+    "responseRate": 0.91,
+    "returnWindowDays": 3,
+    "specialties": ["grocery", "household"]
+  },
+  {
+    "id": "S006",
+    "name": "CasaCalm Living",
+    "rating": 4.7,
+    "isPreferred": true,
+    "location": "Singapore",
+    "fulfillment": "Shopee Express",
+    "responseRate": 0.94,
+    "returnWindowDays": 15,
+    "specialties": ["home_decor", "storage", "lighting"]
+  }
+]

@@ -1,0 +1,111 @@
+[
+  {
+    "user_id": "u_001",
+    "name": "Demo User",
+    "location": "Singapore",
+    "preferences": {
+      "delivery_priority": "fast",
+      "budget_sensitivity": "medium",
+      "preferred_sellers": ["S001", "S002", "S004"],
+      "preferred_payment": "ShopeePay",
+      "avoid": ["strong fragrance"]
+    },
+    "household_context": {
+      "home_type": "apartment",
+      "has_basic_tools": false,
+      "style": ["minimal", "practical"]
+    },
+    "order_history": [
+      {
+        "product_id": "SK001",
+        "category": "beauty",
+        "purchased_at": "2026-04-18T00:00:00.000Z",
+        "quantity": 1,
+        "satisfaction": 5
+      },
+      {
+        "product_id": "GR001",
+        "category": "grocery",
+        "purchased_at": "2026-05-05T00:00:00.000Z",
+        "quantity": 2,
+        "satisfaction": 4
+      },
+      {
+        "product_id": "EL001",
+        "category": "electronics",
+        "purchased_at": "2026-03-22T00:00:00.000Z",
+        "quantity": 1,
+        "satisfaction": 5
+      }
+    ],
+    "cart": []
+  },
+  {
+    "user_id": "u_002",
+    "name": "Budget Fast Shopper",
+    "location": "Singapore",
+    "preferences": {
+      "delivery_priority": "fast",
+      "budget_sensitivity": "high",
+      "preferred_sellers": ["S001", "S005", "S006"],
+      "preferred_payment": "Credit Card",
+      "avoid": []
+    },
+    "household_context": {
+      "home_type": "rental",
+      "has_basic_tools": true,
+      "style": ["rental-friendly", "compact"]
+    },
+    "order_history": [
+      {
+        "product_id": "GR003",
+        "category": "grocery",
+        "purchased_at": "2026-04-30T00:00:00.000Z",
+        "quantity": 1,
+        "satisfaction": 4
+      },
+      {
+        "product_id": "HD004",
+        "category": "home_decor",
+        "purchased_at": "2026-05-15T00:00:00.000Z",
+        "quantity": 2,
+        "satisfaction": 5
+      }
+    ],
+    "cart": []
+  },
+  {
+    "user_id": "u_003",
+    "name": "Style Shopper",
+    "location": "Singapore",
+    "preferences": {
+      "delivery_priority": "standard",
+      "budget_sensitivity": "low",
+      "preferred_sellers": ["S003", "S006"],
+      "preferred_payment": "ShopeePay",
+      "avoid": ["oversized fit"]
+    },
+    "household_context": {
+      "home_type": "condo",
+      "has_basic_tools": true,
+      "style": ["smart casual", "warm minimal"]
+    },
+    "order_history": [
+      {
+        "product_id": "FA002",
+        "category": "fashion",
+        "purchased_at": "2026-04-08T00:00:00.000Z",
+        "quantity": 1,
+        "satisfaction": 5
+      },
+      {
+        "product_id": "HD001",
+        "category": "home_decor",
+        "purchased_at": "2026-02-12T00:00:00.000Z",
+        "quantity": 1,
+        "satisfaction": 4
+      }
+    ],
+    "cart": []
+  }
+]
