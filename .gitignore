@@ -2,3 +2,6 @@ log/
 .env
 ios/DerivedData/
 
+*.xcuserstate
+xcuserdata/
+.DS_Store
