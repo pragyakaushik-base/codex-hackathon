@@ -10,6 +10,11 @@
 		FA0000010000000000000001 /* ShopeeHybridAgentApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000010000000000000011 /* ShopeeHybridAgentApp.swift */; };
 		FA0000010000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000010000000000000012 /* ContentView.swift */; };
 		FA0000010000000000000003 /* Web in Resources */ = {isa = PBXBuildFile; fileRef = FA0000010000000000000014 /* Web */; };
+		FA0000010000000000000004 /* ARShoppingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000010000000000000015 /* ARShoppingViewModel.swift */; };
+		FA0000010000000000000005 /* ARShoppingSceneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000010000000000000016 /* ARShoppingSceneView.swift */; };
+		FA0000010000000000000006 /* DemoCatalog in Resources */ = {isa = PBXBuildFile; fileRef = FA0000010000000000000017 /* DemoCatalog */; };
+		FA0000010000000000000007 /* ARCameraSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0000010000000000000018 /* ARCameraSnapshotStore.swift */; };
+		FA0000010000000000000008 /* Models in Resources */ = {isa = PBXBuildFile; fileRef = FA0000010000000000000019 /* Models */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,6 +23,11 @@
 		FA0000010000000000000012 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		FA0000010000000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FA0000010000000000000014 /* Web */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Web; sourceTree = "<group>"; };
+		FA0000010000000000000015 /* ARShoppingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARShoppingViewModel.swift; sourceTree = "<group>"; };
+		FA0000010000000000000016 /* ARShoppingSceneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARShoppingSceneView.swift; sourceTree = "<group>"; };
+		FA0000010000000000000017 /* DemoCatalog */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DemoCatalog; sourceTree = "<group>"; };
+		FA0000010000000000000018 /* ARCameraSnapshotStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARCameraSnapshotStore.swift; sourceTree = "<group>"; };
+		FA0000010000000000000019 /* Models */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Models; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,8 +54,13 @@
 			children = (
 				FA0000010000000000000011 /* ShopeeHybridAgentApp.swift */,
 				FA0000010000000000000012 /* ContentView.swift */,
+				FA0000010000000000000015 /* ARShoppingViewModel.swift */,
+				FA0000010000000000000016 /* ARShoppingSceneView.swift */,
+				FA0000010000000000000018 /* ARCameraSnapshotStore.swift */,
 				FA0000010000000000000013 /* Info.plist */,
 				FA0000010000000000000014 /* Web */,
+				FA0000010000000000000017 /* DemoCatalog */,
+				FA0000010000000000000019 /* Models */,
 			);
 			path = ShopeeHybridAgent;
 			sourceTree = "<group>";
@@ -117,6 +132,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA0000010000000000000003 /* Web in Resources */,
+				FA0000010000000000000006 /* DemoCatalog in Resources */,
+				FA0000010000000000000008 /* Models in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -129,6 +146,9 @@
 			files = (
 				FA0000010000000000000001 /* ShopeeHybridAgentApp.swift in Sources */,
 				FA0000010000000000000002 /* ContentView.swift in Sources */,
+				FA0000010000000000000004 /* ARShoppingViewModel.swift in Sources */,
+				FA0000010000000000000005 /* ARShoppingSceneView.swift in Sources */,
+				FA0000010000000000000007 /* ARCameraSnapshotStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,10 +274,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				AGENT_BASE_URL = "http://127.0.0.1:3000";
+				AGENT_BASE_URL = "https://related-prelaw-pug.ngrok-free.dev";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8UWF683H9A;
+				DEVELOPMENT_TEAM = 54UL9MDHC2;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = ShopeeHybridAgent/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -280,7 +300,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				AGENT_BASE_URL = "http://127.0.0.1:3000";
+				AGENT_BASE_URL = "https://related-prelaw-pug.ngrok-free.dev";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 8UWF683H9A;

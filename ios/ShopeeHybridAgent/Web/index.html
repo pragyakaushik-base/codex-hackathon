@@ -10,7 +10,7 @@
 
 <body>
   <main class="app-shell" aria-live="polite">
-    <section class="screen screen-home is-active" data-screen="home" aria-label="Shopee home">
+    <section class="screen screen-home" data-screen="home" aria-label="Shopee home">
       <img class="shop-bg" src="shopee-app-bg.png" alt="" />
       <button class="agent-fab" type="button" data-open-agent aria-label="Open shopping agent">
         <span class="agent-mascot fab-mascot" aria-hidden="true">
@@ -76,15 +76,11 @@
         <span></span>
       </header>
       <div class="camera-preview">
-        <div class="pipe-scene" aria-hidden="true">
-          <div class="cabinet"></div>
-          <div class="pipe vertical"></div>
-          <div class="pipe elbow"></div>
-          <div class="pipe horizontal"></div>
-          <div class="pipe lower"></div>
-          <div class="drop"></div>
+        <video class="camera-feed" data-camera-feed autoplay playsinline muted></video>
+        <div class="camera-overlay">
+          <div class="camera-status" data-camera-status>Opening camera...</div>
+          <p>Tap the capture button<br />to snap a photo</p>
         </div>
-        <p>Tap the capture button<br />to snap a photo</p>
       </div>
       <nav class="camera-controls">
         <button class="glass-control icon-gallery" type="button" aria-label="Gallery"></button>
@@ -115,31 +111,31 @@
         <strong>Recommendations</strong>
         <span></span>
       </header>
-      <div class="chat-bubble">I found the best matches for your leak. Here are the top options.</div>
+      <div class="chat-bubble" data-agent-summary>I found the best matches for your leak. Here are the top options.</div>
       <div class="chips" aria-label="Filters">
-        <span>Best Match</span>
-        <span>High Rated</span>
-        <span>Fast Delivery</span>
+        <span data-status-chip>Desk not detected</span>
+        <span>AR Ready</span>
+        <span>Native Sync</span>
       </div>
       <div class="product-list"></div>
       <nav class="bottom-actions compact">
-        <button class="pill-button" type="button">Why these?</button>
-        <button class="pill-button" type="button">Compare</button>
-        <button class="primary-button" type="button" data-add-last-bundle>Add all</button>
+        <button class="pill-button" type="button" data-native-action="place">Place In AR</button>
+        <button class="pill-button" type="button" data-agent-command="I like the second one.">Choose #2</button>
+        <button class="primary-button" type="button" data-native-action="cart" data-go="cart">Add Selected</button>
       </nav>
     </section>
 
     <section class="screen agent-screen cart-screen" data-screen="cart" aria-label="Cart">
-      <div class="chat-bubble" data-cart-message>Your cart is empty.</div>
+      <div class="chat-bubble" data-cart-message data-cart-summary>Your cart is empty.</div>
       <header class="section-header">
-        <strong data-cart-title>Cart (0 items)</strong>
+        <strong data-cart-title data-cart-count>Cart (0 items)</strong>
         <button type="button" data-clear-cart>Clear</button>
       </header>
       <div class="cart-list"></div>
       <div class="voucher-card" data-voucher-card>
         <span data-voucher-label>Voucher</span>
         <strong data-voucher-code>No eligible voucher</strong>
-        <em data-voucher-saving>Keep shopping to unlock savings</em>
+        <em data-voucher-saving data-cart-total>Keep shopping to unlock savings</em>
       </div>
       <button class="primary-button full" type="button" data-open-checkout>View Checkout</button>
     </section>

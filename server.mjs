@@ -26,6 +26,7 @@ loadEnv(path.join(__dirname, ".env"));
 
 const host = process.env.HOST || "0.0.0.0";
 const port = Number(process.env.PORT || 3000);
+const publicBaseUrl = normalizeBaseUrl(process.env.PUBLIC_BASE_URL || process.env.AGENT_BASE_URL);
 const webRoot = path.join(__dirname, "ios", "ShopeeHybridAgent", "Web");
 
 const TOOL_ROUTES = {
@@ -106,6 +107,9 @@ server.listen(port, host, () => {
   for (const address of getLanAddresses()) {
     console.log(`iPhone LAN URL: http://${address}:${port}`);
   }
+  if (publicBaseUrl) {
+    console.log(`Public URL: ${publicBaseUrl}`);
+  }
 });
 
 function loadEnv(filePath) {
@@ -133,6 +137,12 @@ function getLanAddresses() {
     }
   }
   return addresses;
+}
+
+function normalizeBaseUrl(value) {
+  const trimmed = value?.trim();
+  if (!trimmed) return "";
+  return trimmed.endsWith("/") ? trimmed.slice(0, -1) : trimmed;
 }
 
 async function readTextBody(req) {
@@ -415,7 +425,9 @@ Tool strategy:
 2. Check user history early when the request may involve replenishment, prior preferences, duplicate avoidance, or context such as home setup.
 3. If the user refers to what they are seeing, holding, pointing at, wearing, or photographing, call analyze_surroundings before classification or catalog search.
 4. Search only the catalog tool for recommendations.
-5. Explain recommendations using factual product fields such as bestFor, tradeoffs, rating, delivery, seller, and stock.
+5. When the user wants to build, place, preview, or remix a desk setup in AR or 3D, call build_spatial_setup.
+6. Treat short follow-up edits like "remove the lamp", "make it more aesthetic", "make it cheaper", or "keep the monitor but change the accessories" as build_spatial_setup requests when a setup already exists.
+7. Explain recommendations using factual product fields such as bestFor, tradeoffs, rating, delivery, seller, stock, fit score, and total price.
 6. Suggest compatible bundles when the user is solving a practical task.
 7. Compare products when multiple options are plausible.
 8. Never add items to or remove items from cart without explicit user confirmation.

@@ -5,21 +5,22 @@ let cartCheckout = null;
 let realtime = null;
 let voiceSessionStarting = false;
 let voiceStartToken = 0;
+let cameraStream = null;
+
 const handledRealtimeCalls = new Set();
 const injectedApiBase = window.__AGENT_BASE_URL || '';
 const API_BASE = injectedApiBase || (location.protocol === 'file:' ? 'http://127.0.0.1:3000' : '');
-
 const screens = [...document.querySelectorAll('[data-screen]')];
 const productList = document.querySelector('.product-list');
 const cartList = document.querySelector('.cart-list');
-const cartMessage = document.querySelector('[data-cart-message]');
-const cartTitle = document.querySelector('[data-cart-title]');
+const cartMessage = document.querySelector('[data-cart-message], [data-cart-summary]');
+const cartTitle = document.querySelector('[data-cart-title], [data-cart-count]');
 const clearCartButton = document.querySelector('[data-clear-cart]');
 const openCheckoutButton = document.querySelector('[data-open-checkout]');
 const voucherCard = document.querySelector('[data-voucher-card]');
 const voucherLabel = document.querySelector('[data-voucher-label]');
 const voucherCode = document.querySelector('[data-voucher-code]');
-const voucherSaving = document.querySelector('[data-voucher-saving]');
+const voucherSaving = document.querySelector('[data-voucher-saving], [data-cart-total]');
 const checkoutMessage = document.querySelector('[data-checkout-message]');
 const checkoutSubtotalLabel = document.querySelector('[data-checkout-subtotal-label]');
 const checkoutSubtotal = document.querySelector('[data-checkout-subtotal]');
@@ -33,11 +34,19 @@ const voiceAgentScreen = document.querySelector('.voice-agent-screen');
 const voiceStatus = document.querySelector('[data-voice-status]');
 const activityList = document.querySelector('[data-agent-activity]');
 const activitySummary = document.querySelector('[data-agent-activity-summary]');
+const cameraFeed = document.querySelector('[data-camera-feed]');
+const cameraStatus = document.querySelector('[data-camera-status]');
+const cameraPreview = document.querySelector('.camera-preview');
+const agentInput = document.querySelector('[data-agent-input]');
+const agentSummary = document.querySelector('[data-agent-summary]');
+const statusChip = document.querySelector('[data-status-chip]');
+
 const activitySteps = [
   { tool: 'check_user_history', label: 'Checking your shopping history' },
   { tool: 'analyze_surroundings', label: 'Analyzing camera view' },
   { tool: 'classify_need', label: 'Understanding your request' },
   { tool: 'search_catalog', label: 'Searching Shopee catalog' },
+  { tool: 'build_spatial_setup', label: 'Designing your AR setup' },
   { tool: 'recommend_bundle', label: 'Finding useful add-ons' },
   { tool: 'compare_products', label: 'Comparing best matches' },
   { tool: 'add_to_cart', label: 'Adding to cart' },
@@ -47,12 +56,76 @@ const activitySteps = [
 ];
 const activityState = new Map(activitySteps.map((step) => [step.tool, 'idle']));
 
+let nativeState = {
+  prompt: agentInput?.value || '',
+  sceneStatus: '',
+  planeDetected: false,
+  selectedProductID: null,
+  recommendations: [],
+  cart: []
+};
+
 function postNative(event, payload = {}) {
   window.webkit?.messageHandlers?.nativeBridge?.postMessage({ event, ...payload });
 }
 
+function setCameraState(state, message = '') {
+  if (cameraPreview) {
+    cameraPreview.dataset.cameraState = state;
+  }
+
+  if (cameraStatus) {
+    cameraStatus.textContent = message;
+    cameraStatus.hidden = !message;
+  }
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach((track) => track.stop());
+    cameraStream = null;
+  }
+
+  if (cameraFeed) {
+    cameraFeed.pause();
+    cameraFeed.srcObject = null;
+  }
+}
+
+async function startCamera() {
+  if (!cameraFeed) return;
+  if (!navigator.mediaDevices?.getUserMedia) {
+    setCameraState('error', 'Camera is not supported on this device.');
+    return;
+  }
+  if (cameraStream) {
+    setCameraState('live');
+    return;
+  }
+
+  setCameraState('loading', 'Opening camera...');
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: 'environment' }
+      },
+      audio: false
+    });
+
+    cameraStream = stream;
+    cameraFeed.srcObject = stream;
+    await cameraFeed.play();
+    setCameraState('live');
+  } catch (error) {
+    console.error('Unable to start camera preview', error);
+    setCameraState('error', 'Camera access was denied or is unavailable.');
+  }
+}
+
 function go(screenName, options = {}) {
   const { autoStartVoice = true } = options;
+
   screens.forEach((screen) => {
     screen.classList.toggle('is-active', screen.dataset.screen === screenName);
   });
@@ -65,6 +138,12 @@ function go(screenName, options = {}) {
     voiceAgentScreen?.classList.remove('is-speaking');
   }
 
+  if (screenName === 'camera') {
+    startCamera();
+  } else {
+    stopCamera();
+  }
+
   postNative('screen_changed', { screen: screenName });
 
   if (screenName === 'listening' && autoStartVoice) {
@@ -72,30 +151,31 @@ function go(screenName, options = {}) {
   }
 }
 
-function productArt(product, index) {
-  const { color, accent } = artColorFor(product, index);
-  if (index === 0) {
-    return `<div class="part coupling" style="--color:${color};--accent:${accent}"></div>`;
+function productArt(product, index = 0) {
+  const accent = product?.accentHex;
+  if (accent) {
+    return `
+      <div class="gear-thumb" style="--accent:${accent}">
+        <span class="gear-body"></span>
+        <span class="gear-base"></span>
+      </div>
+    `;
   }
-  if (index === 1) {
-    return `<div class="part tape" style="--color:${color};--accent:${accent}"></div>`;
-  }
-  return `<div class="part sealant" style="--color:${color};--accent:${accent}"></div>`;
-}
 
-function artColorFor(product, index) {
   const palette = [
     { color: '#e8e9e8', accent: '#cfd2d1' },
     { color: '#eddaf4', accent: '#a773b5' },
     { color: '#1d2327', accent: '#f36f28' },
     { color: '#e6f5fb', accent: '#66a9c8' }
   ];
-  if (product.category === 'beauty') return { color: '#ffe6ec', accent: '#df7894' };
-  if (product.category === 'fashion') return { color: '#dfe6ef', accent: '#2c3d55' };
-  if (product.category === 'electronics') return { color: '#e7f4ff', accent: '#2d73c7' };
-  if (product.category === 'grocery') return { color: '#e8f6df', accent: '#6baa45' };
-  if (product.category === 'home_decor') return { color: '#f2e8db', accent: '#a7794f' };
-  return palette[index % palette.length];
+  const selected = palette[index % palette.length];
+  if (index === 0) {
+    return `<div class="part coupling" style="--color:${selected.color};--accent:${selected.accent}"></div>`;
+  }
+  if (index === 1) {
+    return `<div class="part tape" style="--color:${selected.color};--accent:${selected.accent}"></div>`;
+  }
+  return `<div class="part sealant" style="--color:${selected.color};--accent:${selected.accent}"></div>`;
 }
 
 function productMedia(product, index, size = 'large') {
@@ -110,28 +190,70 @@ function productMedia(product, index, size = 'large') {
   return `<figure class="product-media product-media-${size}">${productArt(product, index)}</figure>`;
 }
 
+function formatPrice(value) {
+  const number = Number(value || 0);
+  return Number.isInteger(number) ? number.toFixed(0) : number.toFixed(2);
+}
+
+function formatMoney(value) {
+  return `$${Number(value || 0).toFixed(2)}`;
+}
+
+function currentProducts() {
+  return nativeState.recommendations.length ? nativeState.recommendations : products;
+}
+
+function currentCartLines() {
+  if (nativeState.cart.length) {
+    return nativeState.cart.map((product) => ({
+      product,
+      quantity: 1,
+      lineTotal: product.price
+    }));
+  }
+
+  return cartLines;
+}
+
 function renderProducts() {
-  productList.innerHTML = products.map((product, index) => `
-    <article class="product-card">
+  const visibleProducts = currentProducts();
+  const visibleCartLines = currentCartLines();
+  const selectedProductID = nativeState.selectedProductID;
+
+  if (agentInput) {
+    agentInput.value = nativeState.prompt || agentInput.value;
+  }
+
+  if (agentSummary) {
+    agentSummary.textContent = nativeState.sceneStatus || 'I found the best matches for your leak. Here are the top options.';
+  }
+
+  if (statusChip) {
+    statusChip.textContent = nativeState.planeDetected ? 'Desk detected' : 'Desk not detected';
+  }
+
+  productList.innerHTML = visibleProducts.map((product, index) => `
+    <article class="product-card ${product.id === selectedProductID ? 'is-selected' : ''}">
       ${productMedia(product, index)}
       <div>
         <h2>${escapeHtml(product.title)}</h2>
-        <strong>$${Number(product.price).toFixed(2)}</strong>
-        <p><span class="star">★</span> ${product.rating} <span>(${product.reviewCount || 0})</span></p>
+        <strong>$${formatPrice(product.price)}</strong>
+        <p><span class="star">★</span> ${Number(product.rating || 0).toFixed(1)} <span>${product.reviewCount ? `(${product.reviewCount})` : `#${index + 1}`}</span></p>
         <small>${formatDelivery(product.delivery)}</small>
+        ${product.summary ? `<small>${escapeHtml(product.summary)}</small>` : ''}
       </div>
-      <button class="bookmark" type="button" aria-label="Save ${escapeHtml(product.title)}"></button>
+      <button class="bookmark" type="button" data-select-product="${escapeHtml(product.id)}" aria-label="Select ${escapeHtml(product.title)}">${product.id === selectedProductID ? 'Selected' : nativeState.recommendations.length ? 'Pick' : 'Save'}</button>
     </article>
   `).join('');
 
-  cartList.innerHTML = cartLines.map((line, index) => `
+  cartList.innerHTML = visibleCartLines.map((line, index) => `
     <article class="cart-item">
       ${productMedia(line.product, index, 'small')}
       <div class="cart-item-main">
         <h2>${escapeHtml(line.product.title)}</h2>
-        <strong>$${Number(line.lineTotal).toFixed(2)}</strong>
+        <strong>$${formatPrice(line.lineTotal)}</strong>
       </div>
-      <span>x${line.quantity}</span>
+      <span>x${line.quantity || 1}</span>
       <button class="cart-remove" type="button" data-remove-cart-item="${escapeHtml(line.product.id)}" aria-label="Remove ${escapeHtml(line.product.title)}">Remove</button>
     </article>
   `).join('');
@@ -141,17 +263,25 @@ function renderProducts() {
 }
 
 function renderCartSummary() {
-  const itemCount = cartLines.reduce((sum, line) => sum + (Number(line.quantity) || 0), 0);
-  if (cartTitle) cartTitle.textContent = `Cart (${itemCount} ${itemCount === 1 ? 'item' : 'items'})`;
+  const visibleCartLines = currentCartLines();
+  const itemCount = visibleCartLines.reduce((sum, line) => sum + (Number(line.quantity) || 0), 0);
+
+  if (cartTitle) {
+    cartTitle.textContent = `Cart (${itemCount} ${itemCount === 1 ? 'item' : 'items'})`;
+  }
+
   if (cartMessage) {
     if (!itemCount) {
-      cartMessage.textContent = 'Your cart is empty. Add recommended products to preview savings and checkout.';
+      cartMessage.textContent = nativeState.recommendations.length
+        ? 'Select a recommendation, then add it to the cart.'
+        : 'Your cart is empty. Add recommended products to preview savings and checkout.';
     } else if (cartCheckout?.voucher) {
       cartMessage.textContent = `I found ${itemCount} ${itemCount === 1 ? 'item' : 'items'} in your cart and applied the best voucher.`;
     } else {
-      cartMessage.textContent = `I found ${itemCount} ${itemCount === 1 ? 'item' : 'items'} in your cart. No voucher applies yet.`;
+      cartMessage.textContent = `${visibleCartLines[visibleCartLines.length - 1].product.title} is in your cart.`;
     }
   }
+
   if (clearCartButton) clearCartButton.disabled = itemCount === 0;
   if (openCheckoutButton) openCheckoutButton.disabled = itemCount === 0;
 
@@ -163,21 +293,24 @@ function renderCartSummary() {
   if (voucherSaving) {
     voucherSaving.textContent = voucher
       ? `Saved $${discount.toFixed(2)}`
-      : itemCount ? 'No voucher applies yet' : 'Your cart is empty';
+      : itemCount
+        ? `Subtotal ${formatMoney(visibleCartLines.reduce((sum, line) => sum + Number(line.lineTotal || 0), 0))}`
+        : 'Your cart is empty';
   }
 }
 
 function renderCheckoutSummary() {
+  const visibleCartLines = currentCartLines();
   const checkout = cartCheckout || {
-    cart: cartLines,
-    subtotal: cartLines.reduce((sum, line) => sum + Number(line.lineTotal || 0), 0),
-    shippingFee: cartLines.length ? 2.99 : 0,
+    cart: visibleCartLines,
+    subtotal: visibleCartLines.reduce((sum, line) => sum + Number(line.lineTotal || 0), 0),
+    shippingFee: visibleCartLines.length ? 2.99 : 0,
     voucherDiscount: 0,
-    total: cartLines.reduce((sum, line) => sum + Number(line.lineTotal || 0), 0) + (cartLines.length ? 2.99 : 0),
+    total: visibleCartLines.reduce((sum, line) => sum + Number(line.lineTotal || 0), 0) + (visibleCartLines.length ? 2.99 : 0),
     estimatedDelivery: null,
     paymentMethod: 'ShopeePay'
   };
-  const itemCount = (checkout.cart || cartLines).reduce((sum, line) => sum + (Number(line.quantity) || 0), 0);
+  const itemCount = (checkout.cart || visibleCartLines).reduce((sum, line) => sum + (Number(line.quantity) || 0), 0);
   const hasItems = itemCount > 0;
   const discount = Number(checkout.voucherDiscount || 0);
 
@@ -196,10 +329,6 @@ function renderCheckoutSummary() {
   if (proceedCheckoutButton) proceedCheckoutButton.disabled = !hasItems;
 }
 
-function formatMoney(value) {
-  return `$${Number(value || 0).toFixed(2)}`;
-}
-
 function escapeHtml(value = '') {
   return String(value).replace(/[&<>"']/g, (character) => ({
     '&': '&amp;',
@@ -215,7 +344,7 @@ function renderActivity() {
 
   const hasProgress = activitySteps.some((step) => activityState.get(step.tool) !== 'idle');
   let visibleSteps = activitySteps.filter((step) => {
-    if (!hasProgress) return ['check_user_history', 'classify_need', 'search_catalog'].includes(step.tool);
+    if (!hasProgress) return ['check_user_history', 'classify_need', 'search_catalog', 'build_spatial_setup', 'recommend_bundle'].includes(step.tool);
     return activityState.get(step.tool) !== 'idle';
   });
 
@@ -257,10 +386,46 @@ function setToolActivity(toolName, status) {
   renderActivity();
 }
 
+function submitAgentPrompt(prompt) {
+  const value = prompt?.trim();
+  if (!value) return;
+  nativeState.prompt = value;
+  postNative('agent_prompt', { prompt: value });
+}
+
+window.syncNativeState = function syncNativeState(nextState) {
+  nativeState = {
+    ...nativeState,
+    ...nextState,
+    recommendations: nextState.recommendations || [],
+    cart: nextState.cart || []
+  };
+
+  if (nextState.checkout) {
+    cartCheckout = nextState.checkout;
+  }
+
+  renderProducts();
+
+  if (nativeState.recommendations.length && !document.querySelector('[data-screen="suggestions"]').classList.contains('is-active')) {
+    go('suggestions');
+  }
+
+  if (nativeState.cart.length && !document.querySelector('[data-screen="cart"]').classList.contains('is-active')) {
+    go('cart');
+  }
+};
+
 document.addEventListener('click', (event) => {
   const voiceButton = event.target.closest('[data-start-voice]');
   if (voiceButton) {
     toggleVoiceSession();
+    return;
+  }
+
+  const nativeCameraButton = event.target.closest('[data-go="camera"]');
+  if (nativeCameraButton) {
+    postNative('cameraTapped');
     return;
   }
 
@@ -288,10 +453,47 @@ document.addEventListener('click', (event) => {
     return;
   }
 
+  const submitButton = event.target.closest('[data-agent-submit]');
+  if (submitButton) {
+    submitAgentPrompt(agentInput?.value || '');
+    return;
+  }
+
+  const commandButton = event.target.closest('[data-agent-command]');
+  if (commandButton) {
+    submitAgentPrompt(commandButton.dataset.agentCommand || '');
+    return;
+  }
+
+  const selectButton = event.target.closest('[data-select-product]');
+  if (selectButton) {
+    nativeState.selectedProductID = selectButton.dataset.selectProduct;
+    postNative('select_product', { productId: selectButton.dataset.selectProduct });
+    renderProducts();
+    return;
+  }
+
+  const nativeAction = event.target.closest('[data-native-action]');
+  if (nativeAction?.dataset.nativeAction === 'place') {
+    postNative('place_recommendations');
+    return;
+  }
+
+  if (nativeAction?.dataset.nativeAction === 'cart') {
+    postNative('add_selected_to_cart');
+  }
+
   const target = event.target.closest('[data-go], [data-open-agent]');
   if (!target) return;
   const next = target.dataset.go || 'listening';
   go(next);
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey && event.target === agentInput) {
+    event.preventDefault();
+    submitAgentPrompt(agentInput.value);
+  }
 });
 
 async function bootstrap() {
@@ -300,15 +502,15 @@ async function bootstrap() {
     products = data.featuredProducts.slice(0, 3);
     cartLines = data.cart.cart;
     cartCheckout = data.cart.checkout;
-    renderProducts();
-    postNative('web_ready');
   } catch (error) {
     console.error(error);
     setVoiceStatus('Start the local server to enable voice.');
     products = fallbackProducts();
     cartLines = products.map((product) => ({ product, quantity: 1, lineTotal: product.price }));
     cartCheckout = null;
+  } finally {
     renderProducts();
+    postNative('web_ready');
   }
 }
 
@@ -525,6 +727,18 @@ async function applyToolResult(name, result) {
     if (products.length) go('suggestions');
   }
 
+  if (name === 'build_spatial_setup') {
+    const setupProducts = (result.items || []).map((item) => item.product).filter(Boolean);
+    if (setupProducts.length) {
+      products = setupProducts;
+      lastBundleIds = setupProducts.map((product) => product.id);
+      nativeState.selectedProductID = setupProducts[0].id;
+      setVoiceStatus(result.summary || 'Your 3D setup is ready.');
+      postNative('apply_spatial_setup', { setup: result });
+      go('suggestions');
+    }
+  }
+
   if (name === 'recommend_bundle') {
     const bundle = result.bundle || [];
     lastBundleIds = [result.primaryProduct?.id, ...bundle.map((product) => product.id)].filter(Boolean);
@@ -638,7 +852,7 @@ async function addLastBundleToCart() {
   });
   cartLines = result.cart || [];
   renderProducts();
-  cartCheckout = (await postJson('/api/tools/checkout-preview', { userId: 'u_001' }));
+  cartCheckout = await postJson('/api/tools/checkout-preview', { userId: 'u_001' });
   renderProducts();
   go('cart');
 }
@@ -676,6 +890,7 @@ async function clearCart() {
   const result = await postJson('/api/cart/reset', { userId: 'u_001' });
   cartLines = result.cart || [];
   cartCheckout = result.checkout || null;
+  nativeState.cart = [];
   renderProducts();
 }
 
@@ -726,6 +941,7 @@ function voiceErrorMessage(error) {
   const message = String(error?.message || error || 'Unknown error');
   if (message.startsWith('LOCAL_SERVER_UNREACHABLE:')) return message.replace('LOCAL_SERVER_UNREACHABLE:', '');
   if (message.includes('OPENAI_API_KEY')) return 'missing OpenAI API key on the local server.';
+  if (message.includes('Failed to create Realtime session')) return 'the local server could not create the Realtime session.';
   if (message.includes('Failed to fetch') || message.includes('Load failed')) {
     return `cannot reach ${API_BASE || 'the local server'}.`;
   }
@@ -736,16 +952,24 @@ function voiceErrorMessage(error) {
 }
 
 function formatDelivery(delivery) {
-  return String(delivery || 'standard').replace('_', '-').replace(/\b\w/g, (letter) => letter.toUpperCase());
+  return String(delivery || 'standard').replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function fallbackProducts() {
   return [
-    { id: 'HW001', title: '15mm PVC Slip Coupling', category: 'home_repair', price: 4.2, rating: 4.8, reviewCount: 512, delivery: 'next_day' },
-    { id: 'HW002', title: 'PTFE Teflon Seal Tape', category: 'home_repair', price: 1.2, rating: 4.7, reviewCount: 342, delivery: 'next_day' },
-    { id: 'HW003', title: 'Waterproof Pipe Sealant', category: 'home_repair', price: 6.8, rating: 4.6, reviewCount: 198, delivery: 'same_day' }
+    { id: 'HW001', title: '15mm PVC Slip Coupling', category: 'home_repair', price: 4.2, rating: 4.8, reviewCount: 512, delivery: 'next_day', accentHex: '#ee4d2d' },
+    { id: 'HW002', title: 'PTFE Teflon Seal Tape', category: 'home_repair', price: 1.2, rating: 4.7, reviewCount: 342, delivery: 'next_day', accentHex: '#f6a623' },
+    { id: 'HW003', title: 'Waterproof Pipe Sealant', category: 'home_repair', price: 6.8, rating: 4.6, reviewCount: 198, delivery: 'same_day', accentHex: '#3cb371' }
   ];
 }
 
+renderProducts();
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    stopCamera();
+  }
+});
+window.addEventListener('pagehide', stopCamera);
+go('home');
 bootstrap();
 renderActivity();

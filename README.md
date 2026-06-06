@@ -34,9 +34,19 @@ or:
 https://your-current-ngrok-url.ngrok-free.app/api/bootstrap
 ```
 
+If you are using ngrok instead of LAN, add your tunnel URL to `.env` and use the same URL for `AgentBaseURL`:
+
+```sh
+PUBLIC_BASE_URL=https://your-ngrok-subdomain.ngrok-free.dev
+```
+
+```text
+https://your-ngrok-subdomain.ngrok-free.dev/api/bootstrap
+```
+
 4. Open `ios/ShopeeHybridAgent.xcodeproj` in Xcode and run `ShopeeHybridAgent`.
 
-The iOS app loads `AgentBaseURL` from the `AGENT_BASE_URL` build setting in its `WKWebView` when the server is reachable, with the bundled static mock as a fallback. Tap the floating agent button, then tap the microphone button to start the OpenAI Realtime WebRTC voice session.
+The iOS app loads `AgentBaseURL` from the `AGENT_BASE_URL` build setting in its `WKWebView` when the server is reachable, with the bundled static mock as a fallback. It does not assume `127.0.0.1:3000` unless you set that value explicitly. Tap the floating agent button, then tap the microphone button to start the OpenAI Realtime WebRTC voice session.
 
 ## Implemented Agent Tools
 

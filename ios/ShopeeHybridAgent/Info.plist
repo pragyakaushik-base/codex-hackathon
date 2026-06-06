@@ -32,7 +32,11 @@
 	<key>NSCameraUsageDescription</key>
 	<string>The shopping agent uses the camera to understand what you are looking at and recommend suitable products.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>The shopping agent uses the microphone so you can speak your shopping request.</string>
+	<string>Allow microphone access so you can talk to the shopping agent.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Allow motion access so AR plane detection and camera tracking can work.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Allow speech recognition for voice-first shopping commands.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
