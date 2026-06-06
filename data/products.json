@@ -131,6 +131,146 @@
     "bundleItems": ["SK002", "SK003"]
   },
   {
+    "id": "SK005",
+    "title": "Oil-Free Gel Moisturizer",
+    "category": "beauty",
+    "description": "Lightweight gel moisturizer that absorbs quickly for oily and combination skin in humid weather.",
+    "keywords": ["moisturizer", "gel", "oil free", "oily skin", "combination skin", "lightweight", "skincare"],
+    "price": 8.9,
+    "rating": 4.5,
+    "reviewCount": 214,
+    "sellerId": "S002",
+    "delivery": "same_day",
+    "stock": 70,
+    "imageUrl": "assets/sk005.jpg",
+    "attributes": {
+      "skinType": "oily_combination",
+      "fragranceFree": false,
+      "volume": "60ml",
+      "texture": "gel",
+      "keyIngredients": ["hyaluronic acid", "green tea"]
+    },
+    "bestFor": ["Humid daytime use", "Light hydration without shine", "Layering under sunscreen"],
+    "tradeoffs": ["May not be enough for very dry skin", "Contains light fragrance"],
+    "compatibility": {
+      "routineStep": "moisturizer",
+      "worksWith": ["SK002", "SK003", "SK004"]
+    },
+    "bundleItems": ["SK003", "SK004"]
+  },
+  {
+    "id": "SK006",
+    "title": "Rich Ceramide Night Cream",
+    "category": "beauty",
+    "description": "Richer night moisturizer with ceramides and squalane for dry skin that feels tight by evening.",
+    "keywords": ["moisturizer", "night cream", "ceramide", "dry skin", "squalane", "rich", "skincare"],
+    "price": 19.8,
+    "rating": 4.8,
+    "reviewCount": 356,
+    "sellerId": "S002",
+    "delivery": "next_day",
+    "stock": 42,
+    "imageUrl": "assets/sk006.jpg",
+    "attributes": {
+      "skinType": "dry",
+      "fragranceFree": true,
+      "volume": "50ml",
+      "texture": "cream",
+      "keyIngredients": ["ceramide", "squalane", "cholesterol"]
+    },
+    "bestFor": ["Night routine", "Dry patches", "Stronger barrier support"],
+    "tradeoffs": ["Can feel heavy for oily skin", "Best used at night rather than under makeup"],
+    "compatibility": {
+      "routineStep": "moisturizer",
+      "worksWith": ["SK001", "SK004"]
+    },
+    "bundleItems": ["SK004"]
+  },
+  {
+    "id": "SK007",
+    "title": "Cica Calming Moisturizer",
+    "category": "beauty",
+    "description": "Soothing cica moisturizer for redness-prone or stressed skin after cleansing or exfoliating.",
+    "keywords": ["moisturizer", "cica", "calming", "redness", "sensitive skin", "soothing", "skincare"],
+    "price": 15.5,
+    "rating": 4.7,
+    "reviewCount": 289,
+    "sellerId": "S002",
+    "delivery": "next_day",
+    "stock": 48,
+    "imageUrl": "assets/sk007.jpg",
+    "attributes": {
+      "skinType": "sensitive",
+      "fragranceFree": true,
+      "volume": "55ml",
+      "texture": "lotion cream",
+      "keyIngredients": ["centella asiatica", "madecassoside", "panthenol"]
+    },
+    "bestFor": ["Redness-prone skin", "Post-exfoliation comfort", "Sensitive daily routines"],
+    "tradeoffs": ["Not very mattifying", "Results are more soothing than brightening"],
+    "compatibility": {
+      "routineStep": "moisturizer",
+      "worksWith": ["SK003", "SK004"]
+    },
+    "bundleItems": ["SK003", "SK004"]
+  },
+  {
+    "id": "SK008",
+    "title": "Vitamin C Glow Moisturizer",
+    "category": "beauty",
+    "description": "Daily glow moisturizer with vitamin C derivative and niacinamide for dull-looking skin.",
+    "keywords": ["moisturizer", "vitamin c", "glow", "niacinamide", "dull skin", "brightening", "skincare"],
+    "price": 22.4,
+    "rating": 4.6,
+    "reviewCount": 173,
+    "sellerId": "S002",
+    "delivery": "standard",
+    "stock": 35,
+    "imageUrl": "assets/sk008.jpg",
+    "attributes": {
+      "skinType": "normal_combination",
+      "fragranceFree": false,
+      "volume": "50ml",
+      "texture": "light cream",
+      "keyIngredients": ["vitamin c derivative", "niacinamide", "glycerin"]
+    },
+    "bestFor": ["Dull-looking skin", "Morning glow routine", "Normal to combination skin"],
+    "tradeoffs": ["Not ideal for very reactive skin", "Use sunscreen during daytime routines"],
+    "compatibility": {
+      "routineStep": "moisturizer",
+      "worksWith": ["SK003", "SK004"]
+    },
+    "bundleItems": ["SK003"]
+  },
+  {
+    "id": "SK009",
+    "title": "Budget Aloe Moisture Lotion",
+    "category": "beauty",
+    "description": "Affordable everyday moisture lotion with aloe for normal skin and simple starter routines.",
+    "keywords": ["moisturizer", "aloe", "lotion", "budget", "normal skin", "everyday", "skincare"],
+    "price": 5.9,
+    "rating": 4.3,
+    "reviewCount": 128,
+    "sellerId": "S002",
+    "delivery": "same_day",
+    "stock": 92,
+    "imageUrl": "assets/sk009.jpg",
+    "attributes": {
+      "skinType": "normal",
+      "fragranceFree": false,
+      "volume": "100ml",
+      "texture": "lotion",
+      "keyIngredients": ["aloe vera", "glycerin"]
+    },
+    "bestFor": ["Budget skincare", "Simple daily hydration", "Body and face backup moisturizer"],
+    "tradeoffs": ["Less targeted than treatment creams", "May feel basic for very dry or sensitive skin"],
+    "compatibility": {
+      "routineStep": "moisturizer",
+      "worksWith": ["SK003", "SK004"]
+    },
+    "bundleItems": ["SK004"]
+  },
+  {
     "id": "SK002",
     "title": "Hydrating Facial Mist",
     "category": "beauty",
