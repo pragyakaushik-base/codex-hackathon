@@ -932,6 +932,7 @@
     "sellerId": "S004",
     "delivery": "next_day",
     "stock": 18,
+    "imageUrl": "assets/el008.png",
     "attributes": {
       "setupRole": "monitor",
       "widthCm": 54,
@@ -957,6 +958,7 @@
     "sellerId": "S004",
     "delivery": "next_day",
     "stock": 12,
+    "imageUrl": "assets/el008.png",
     "attributes": {
       "setupRole": "monitor",
       "widthCm": 61,
@@ -982,6 +984,7 @@
     "sellerId": "S004",
     "delivery": "standard",
     "stock": 10,
+    "imageUrl": "assets/el008.png",
     "attributes": {
       "setupRole": "monitor",
       "widthCm": 61,
@@ -1007,6 +1010,7 @@
     "sellerId": "S004",
     "delivery": "same_day",
     "stock": 42,
+    "imageUrl": "assets/el007.png",
     "attributes": {
       "setupRole": "keyboard",
       "widthCm": 31,
@@ -1032,6 +1036,7 @@
     "sellerId": "S004",
     "delivery": "next_day",
     "stock": 26,
+    "imageUrl": "assets/el007.png",
     "attributes": {
       "setupRole": "keyboard",
       "widthCm": 29,
@@ -1057,6 +1062,7 @@
     "sellerId": "S004",
     "delivery": "same_day",
     "stock": 57,
+    "imageUrl": "assets/el006.png",
     "attributes": {
       "setupRole": "mouse",
       "widthCm": 11,
@@ -1082,6 +1088,7 @@
     "sellerId": "S004",
     "delivery": "next_day",
     "stock": 65,
+    "imageUrl": "assets/el006.png",
     "attributes": {
       "setupRole": "mouse",
       "widthCm": 10,
@@ -1107,6 +1114,7 @@
     "sellerId": "S006",
     "delivery": "same_day",
     "stock": 34,
+    "imageUrl": "assets/hd006.png",
     "attributes": {
       "setupRole": "lamp",
       "widthCm": 14,
@@ -1132,6 +1140,7 @@
     "sellerId": "S006",
     "delivery": "next_day",
     "stock": 22,
+    "imageUrl": "assets/hd006.png",
     "attributes": {
       "setupRole": "lamp",
       "widthCm": 15,
@@ -1157,6 +1166,7 @@
     "sellerId": "S004",
     "delivery": "same_day",
     "stock": 48,
+    "imageUrl": "assets/el005.png",
     "attributes": {
       "setupRole": "laptop_stand",
       "widthCm": 24,
@@ -1182,6 +1192,7 @@
     "sellerId": "S006",
     "delivery": "standard",
     "stock": 19,
+    "imageUrl": "assets/el005.png",
     "attributes": {
       "setupRole": "laptop_stand",
       "widthCm": 25,
@@ -1207,6 +1218,7 @@
     "sellerId": "S006",
     "delivery": "same_day",
     "stock": 40,
+    "imageUrl": "assets/hd005.png",
     "attributes": {
       "setupRole": "plant",
       "widthCm": 12,
