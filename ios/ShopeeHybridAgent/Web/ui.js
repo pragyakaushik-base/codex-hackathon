@@ -769,19 +769,53 @@ async function applyToolResult(name, result) {
 async function enrichSurroundingsArgs(args) {
   if (args.imageDataUrl || args.imageBase64 || args.imageUrl) return args;
 
+  setVoiceStatus('Capturing the current view...');
+  try {
+    const nativeFrame = await captureNativeSurroundings(args);
+    if (nativeFrame.imageDataUrl) {
+      args.imageDataUrl = nativeFrame.imageDataUrl;
+    }
+    if (nativeFrame.imageBase64) {
+      args.imageBase64 = nativeFrame.imageBase64;
+    }
+    if (nativeFrame.mimeType) {
+      args.mimeType = nativeFrame.mimeType;
+    }
+    setVoiceStatus('View captured. Analyzing...');
+    return args;
+  } catch (nativeError) {
+    console.warn('Native surroundings capture unavailable', nativeError);
+  }
+
   setVoiceStatus('Opening camera for a quick look...');
   try {
-    const frame = await captureCameraFrame();
-    args.imageDataUrl = frame.imageDataUrl;
-    args.mimeType = frame.mimeType;
+    const webFrame = await captureCameraFrame();
+    args.imageDataUrl = webFrame.imageDataUrl;
+    args.mimeType = webFrame.mimeType;
     setVoiceStatus('Camera view captured. Analyzing...');
-  } catch (error) {
-    console.warn('Camera capture unavailable', error);
-    args.captureError = voiceErrorMessage(error);
+  } catch (webError) {
+    console.warn('Camera capture unavailable', webError);
+    args.captureError = voiceErrorMessage(webError);
     setVoiceStatus('Camera unavailable. I will infer from your request.');
   }
 
   return args;
+}
+
+async function captureNativeSurroundings(args = {}) {
+  if (typeof window.captureNativeCameraView !== 'function') {
+    throw new Error('native camera bridge is unavailable.');
+  }
+
+  const payload = await window.captureNativeCameraView({
+    question: args.question || args.userText || ''
+  });
+
+  if (!payload || (!payload.imageDataUrl && !payload.imageBase64)) {
+    throw new Error('native camera bridge returned no image.');
+  }
+
+  return payload;
 }
 
 async function captureCameraFrame() {
