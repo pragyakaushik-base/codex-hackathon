@@ -621,5 +621,163 @@
       "worksWith": ["HD002"]
     },
     "bundleItems": ["HD002"]
+  },
+  {
+    "id": "HD005",
+    "title": "Ceramic Potted Plant",
+    "category": "home_decor",
+    "description": "Low-maintenance tabletop potted plant in a matte ceramic pot for desks, shelves, and small corners.",
+    "keywords": ["potted plant", "plant", "ceramic pot", "desk plant", "indoor", "home decor", "greenery"],
+    "price": 18.9,
+    "rating": 4.7,
+    "reviewCount": 214,
+    "sellerId": "S006",
+    "delivery": "next_day",
+    "stock": 32,
+    "imageUrl": "assets/hd005.png",
+    "attributes": {
+      "plantType": "indoor foliage",
+      "potMaterial": "ceramic",
+      "height": "22cm",
+      "careLevel": "easy"
+    },
+    "bestFor": ["Desk styling", "Small apartment decor", "Low-maintenance greenery"],
+    "tradeoffs": ["Needs indirect light", "Live plant size may vary slightly"],
+    "compatibility": {
+      "worksWith": ["HD006", "EL006", "EL008"]
+    },
+    "bundleItems": ["HD006", "EL008"]
+  },
+  {
+    "id": "EL005",
+    "title": "MacBook Air 13-inch M3",
+    "category": "electronics",
+    "description": "Lightweight 13-inch MacBook Air with M3 chip, 8GB unified memory, and 256GB SSD for work, study, and travel.",
+    "keywords": ["macbook", "laptop", "apple", "m3", "notebook", "computer", "portable"],
+    "price": 1499,
+    "rating": 4.9,
+    "reviewCount": 386,
+    "sellerId": "S004",
+    "delivery": "next_day",
+    "stock": 11,
+    "imageUrl": "assets/el005.png",
+    "attributes": {
+      "screenSize": "13.6 inch",
+      "processor": "Apple M3",
+      "memory": "8GB",
+      "storage": "256GB SSD",
+      "color": "space gray"
+    },
+    "bestFor": ["Portable productivity", "Student laptop", "Everyday creative work"],
+    "tradeoffs": ["Limited port selection", "Base storage may feel tight for large media files"],
+    "compatibility": {
+      "worksWith": ["EL006", "EL007", "EL008", "HD006"]
+    },
+    "bundleItems": ["EL006", "EL007", "EL008"]
+  },
+  {
+    "id": "HD006",
+    "title": "Adjustable LED Desk Lamp",
+    "category": "home_decor",
+    "description": "Slim adjustable LED desk lamp with touch controls, three brightness levels, and warm-to-cool lighting modes.",
+    "keywords": ["desk lamp", "lamp", "led", "lighting", "study", "work desk", "adjustable"],
+    "price": 34.5,
+    "rating": 4.6,
+    "reviewCount": 172,
+    "sellerId": "S006",
+    "delivery": "same_day",
+    "stock": 25,
+    "imageUrl": "assets/hd006.png",
+    "attributes": {
+      "lightType": "LED",
+      "brightnessLevels": 3,
+      "colorModes": ["warm", "neutral", "cool"],
+      "power": "USB-C"
+    },
+    "bestFor": ["Focused desk work", "Late-night reading", "Compact home office setups"],
+    "tradeoffs": ["Requires USB power source", "Not bright enough for large rooms"],
+    "compatibility": {
+      "worksWith": ["HD005", "EL005", "EL008"]
+    },
+    "bundleItems": ["HD005", "EL008"]
+  },
+  {
+    "id": "EL006",
+    "title": "Wireless Computer Mouse",
+    "category": "electronics",
+    "description": "Compact wireless computer mouse with silent clicks, adjustable DPI, and USB-C rechargeable battery.",
+    "keywords": ["computer mouse", "mouse", "wireless", "silent click", "dpi", "rechargeable", "accessory"],
+    "price": 24.9,
+    "rating": 4.5,
+    "reviewCount": 298,
+    "sellerId": "S004",
+    "delivery": "same_day",
+    "stock": 67,
+    "imageUrl": "assets/el006.png",
+    "attributes": {
+      "connection": "Bluetooth and 2.4GHz USB receiver",
+      "dpi": "800-2400",
+      "battery": "rechargeable",
+      "handedness": "ambidextrous"
+    },
+    "bestFor": ["Laptop productivity", "Quiet office use", "Travel work kit"],
+    "tradeoffs": ["Smaller shape may not suit large hands", "USB receiver can be misplaced"],
+    "compatibility": {
+      "worksWith": ["EL005", "EL007", "EL008"]
+    },
+    "bundleItems": ["EL007", "EL008"]
+  },
+  {
+    "id": "EL007",
+    "title": "Low-Profile Wireless Keyboard",
+    "category": "electronics",
+    "description": "Slim wireless keyboard with quiet scissor-switch keys, multi-device pairing, and Mac-friendly layout.",
+    "keywords": ["keyboard", "wireless keyboard", "low profile", "mac keyboard", "typing", "bluetooth", "accessory"],
+    "price": 49.9,
+    "rating": 4.7,
+    "reviewCount": 241,
+    "sellerId": "S004",
+    "delivery": "next_day",
+    "stock": 38,
+    "imageUrl": "assets/el007.png",
+    "attributes": {
+      "connection": "Bluetooth",
+      "layout": "compact Mac layout",
+      "batteryLife": "up to 3 months",
+      "switchType": "scissor"
+    },
+    "bestFor": ["Home office typing", "MacBook desk setup", "Multi-device workflows"],
+    "tradeoffs": ["No number pad", "Not designed for mechanical keyboard feel"],
+    "compatibility": {
+      "worksWith": ["EL005", "EL006", "EL008"]
+    },
+    "bundleItems": ["EL006", "EL008"]
+  },
+  {
+    "id": "EL008",
+    "title": "27-inch QHD Monitor",
+    "category": "electronics",
+    "description": "27-inch QHD monitor with USB-C display input, slim bezels, and height-adjustable stand for cleaner desk setups.",
+    "keywords": ["monitor", "qhd", "27 inch", "display", "usb-c", "external screen", "computer monitor"],
+    "price": 329,
+    "rating": 4.8,
+    "reviewCount": 184,
+    "sellerId": "S004",
+    "delivery": "next_day",
+    "stock": 16,
+    "imageUrl": "assets/el008.png",
+    "attributes": {
+      "screenSize": "27 inch",
+      "resolution": "2560x1440",
+      "refreshRate": "75Hz",
+      "ports": ["USB-C", "HDMI", "DisplayPort"],
+      "stand": "height adjustable"
+    },
+    "bestFor": ["Expanded laptop workspace", "Home office monitor", "Sharper spreadsheets and design previews"],
+    "tradeoffs": ["Not a high-refresh gaming display", "Large footprint on very small desks"],
+    "compatibility": {
+      "worksWith": ["EL005", "EL006", "EL007", "HD006"]
+    },
+    "bundleItems": ["EL006", "EL007"]
   }
 ]
