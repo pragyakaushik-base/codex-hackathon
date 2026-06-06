@@ -5,7 +5,3 @@ ios/DerivedData/
 *.xcuserstate
 xcuserdata/
 
-
-# Xcode user state
-xcuserdata/
-*.xcuserstate

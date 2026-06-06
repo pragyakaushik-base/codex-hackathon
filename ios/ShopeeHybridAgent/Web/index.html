@@ -1,131 +1,146 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Shopee Shopping Agent</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <main class="app-shell" aria-live="polite">
-      <section class="screen screen-home is-active" data-screen="home" aria-label="Shopee home">
-        <img class="shop-bg" src="shopee-app-bg.png" alt="" />
-        <button class="agent-fab" type="button" data-open-agent aria-label="Open shopping agent">
-          <span class="agent-orb mini" aria-hidden="true"><span></span><span></span><span></span></span>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Shopee Shopping Agent</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <main class="app-shell" aria-live="polite">
+    <section class="screen screen-home is-active" data-screen="home" aria-label="Shopee home">
+      <img class="shop-bg" src="shopee-app-bg.png" alt="" />
+      <button class="agent-fab" type="button" data-open-agent aria-label="Open shopping agent">
+        <span class="agent-orb mini" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
+    </section>
+
+    <section class="screen agent-screen dark-theme" data-screen="listening" aria-label="Listening">
+      <header class="dark-top-bar">
+        <button class="dark-icon-button" type="button" data-go="home" aria-label="Menu">
+          <span class="icon-menu"></span>
         </button>
-      </section>
-
-      <section class="screen agent-screen" data-screen="listening" aria-label="Listening">
-        <header class="top-bar">
-          <button class="icon-button" type="button" data-go="home" aria-label="Close">x</button>
-          <strong>Show me the issue</strong>
-          <button class="icon-button ghost" type="button" aria-label="More"></button>
-        </header>
-        <div class="voice-stage">
-          <div class="wave left"></div>
-          <button class="agent-orb listening" type="button" data-go="camera" aria-label="Continue to camera">
-            <span></span><span></span><span></span>
-          </button>
-          <div class="wave right"></div>
+        <button class="dark-icon-button" type="button" aria-label="Screen">
+          <span class="icon-screen"></span>
+        </button>
+      </header>
+      <div class="voice-stage gemini-style">
+        <div class="agent-bubble"></div>
+        <h1>Listening...</h1>
+      </div>
+      <nav class="bottom-actions gemini-actions">
+        <button class="dark-icon-button icon-camera" type="button" data-go="camera" aria-label="Open camera"></button>
+        <button class="dark-icon-button icon-gallery" type="button" aria-label="Gallery"></button>
+        <div class="gemini-visualizer">
+          <div class="glow-core"></div>
         </div>
-        <div class="agent-copy">
-          <h1>Listening...</h1>
-          <p>You can speak now</p>
-        </div>
-        <nav class="bottom-actions">
-          <button class="round-button" type="button" data-go="home" aria-label="Cancel">x</button>
-          <button class="primary-mic icon-mic" type="button" data-go="camera" aria-label="Use microphone"></button>
-          <button class="round-button icon-camera" type="button" data-go="camera" aria-label="Open camera"></button>
-        </nav>
-      </section>
+        <button class="dark-icon-button icon-mic-outline" type="button" data-go="camera" aria-label="Microphone"></button>
+        <button class="dark-icon-button icon-close" type="button" data-go="home" aria-label="Cancel"></button>
+      </nav>
+    </section>
 
-      <section class="screen camera-screen" data-screen="camera" aria-label="Image snap">
-        <header class="top-bar camera">
-          <button class="icon-button transparent" type="button" data-go="listening" aria-label="Back">x</button>
-          <strong>Show me the issue</strong>
-          <span></span>
-        </header>
-        <div class="camera-preview">
-          <div class="pipe-scene" aria-hidden="true">
-            <div class="cabinet"></div>
-            <div class="pipe vertical"></div>
-            <div class="pipe elbow"></div>
-            <div class="pipe horizontal"></div>
-            <div class="pipe lower"></div>
-            <div class="drop"></div>
+    <section class="screen camera-screen" data-screen="camera" aria-label="Image snap">
+      <header class="top-bar camera">
+        <button class="icon-button transparent" type="button" data-go="listening" aria-label="Back">x</button>
+        <strong>Show me the issue</strong>
+        <span></span>
+      </header>
+      <div class="camera-preview">
+        <div class="pipe-scene" aria-hidden="true">
+          <div class="cabinet"></div>
+          <div class="pipe vertical"></div>
+          <div class="pipe elbow"></div>
+          <div class="pipe horizontal"></div>
+          <div class="pipe lower"></div>
+          <div class="drop"></div>
+        </div>
+        <p>Tap the capture button<br />to snap a photo</p>
+      </div>
+      <nav class="camera-controls">
+        <button class="glass-control icon-gallery" type="button" aria-label="Gallery"></button>
+        <button class="shutter" type="button" data-go="thinking" aria-label="Capture photo"></button>
+        <button class="glass-control icon-flash" type="button" aria-label="Flash"></button>
+      </nav>
+    </section>
+
+    <section class="screen agent-screen" data-screen="thinking" aria-label="Thinking">
+      <header class="brand-bar">Shopee</header>
+      <div class="thinking-wrap">
+        <div class="agent-orb thinking" aria-hidden="true"><span></span><span></span><span></span></div>
+        <h1>Analyzing...</h1>
+      </div>
+      <ol class="progress-list">
+        <li class="done">Image received</li>
+        <li class="done">Leak detected</li>
+        <li class="done">PVC pipe identified</li>
+        <li class="active">Finding matching parts</li>
+        <li>Checking ratings &amp; delivery</li>
+      </ol>
+      <button class="quiet-link" type="button" data-go="suggestions">This will take a few seconds</button>
+    </section>
+
+    <section class="screen agent-screen suggestions-screen" data-screen="suggestions" aria-label="Suggestions">
+      <div class="chat-bubble">I found the best matches for your leak. Here are the top options.</div>
+      <div class="chips" aria-label="Filters">
+        <span>Best Match</span>
+        <span>High Rated</span>
+        <span>Fast Delivery</span>
+      </div>
+      <div class="product-list"></div>
+      <nav class="bottom-actions compact">
+        <button class="pill-button" type="button">Why these?</button>
+        <button class="pill-button" type="button">Compare</button>
+        <button class="primary-button" type="button" data-go="cart">Add all</button>
+      </nav>
+    </section>
+
+    <section class="screen agent-screen cart-screen" data-screen="cart" aria-label="Cart">
+      <div class="chat-bubble">Great I've added them to your cart and applied a free shipping voucher.</div>
+      <header class="section-header">
+        <strong>Cart (3 items)</strong>
+        <button type="button">Edit</button>
+      </header>
+      <div class="cart-list"></div>
+      <div class="voucher-card">
+        <span>Voucher Applied</span>
+        <strong>FREE SHIPPING</strong>
+        <em>Saved $2.99</em>
+      </div>
+      <button class="primary-button full" type="button" data-go="checkout">View Checkout</button>
+    </section>
+
+    <section class="screen agent-screen checkout-screen" data-screen="checkout" aria-label="Checkout preview">
+      <div class="chat-bubble">Here's your order summary. Shall we proceed to checkout?</div>
+      <section class="summary-card">
+        <h2>Order Summary</h2>
+        <dl>
+          <div>
+            <dt>Subtotal (3 items)</dt>
+            <dd>$12.20</dd>
           </div>
-          <p>Tap the capture button<br />to snap a photo</p>
-        </div>
-        <nav class="camera-controls">
-          <button class="glass-control icon-gallery" type="button" aria-label="Gallery"></button>
-          <button class="shutter" type="button" data-go="thinking" aria-label="Capture photo"></button>
-          <button class="glass-control icon-flash" type="button" aria-label="Flash"></button>
-        </nav>
+          <div>
+            <dt>Shipping Fee</dt>
+            <dd class="muted"><s>$2.99</s></dd>
+          </div>
+          <div>
+            <dt>Voucher Discount</dt>
+            <dd class="green">-$2.99</dd>
+          </div>
+          <div class="total">
+            <dt>Total</dt>
+            <dd>$12.20</dd>
+          </div>
+        </dl>
       </section>
+      <div class="checkout-row"><span>Estimated Delivery</span><strong>Tomorrow, 10 May</strong></div>
+      <div class="checkout-row"><span>Payment Method</span><strong>ShopeePay</strong></div>
+      <button class="checkout-button" type="button">Proceed to Checkout</button>
+      <button class="round-button close-bottom" type="button" data-go="home" aria-label="Close">x</button>
+    </section>
+  </main>
+  <script src="ui.js"></script>
+</body>
 
-      <section class="screen agent-screen" data-screen="thinking" aria-label="Thinking">
-        <header class="brand-bar">Shopee</header>
-        <div class="thinking-wrap">
-          <div class="agent-orb thinking" aria-hidden="true"><span></span><span></span><span></span></div>
-          <h1>Analyzing...</h1>
-        </div>
-        <ol class="progress-list">
-          <li class="done">Image received</li>
-          <li class="done">Leak detected</li>
-          <li class="done">PVC pipe identified</li>
-          <li class="active">Finding matching parts</li>
-          <li>Checking ratings &amp; delivery</li>
-        </ol>
-        <button class="quiet-link" type="button" data-go="suggestions">This will take a few seconds</button>
-      </section>
-
-      <section class="screen agent-screen suggestions-screen" data-screen="suggestions" aria-label="Suggestions">
-        <div class="chat-bubble">I found the best matches for your leak. Here are the top options.</div>
-        <div class="chips" aria-label="Filters">
-          <span>Best Match</span>
-          <span>High Rated</span>
-          <span>Fast Delivery</span>
-        </div>
-        <div class="product-list"></div>
-        <nav class="bottom-actions compact">
-          <button class="pill-button" type="button">Why these?</button>
-          <button class="pill-button" type="button">Compare</button>
-          <button class="primary-button" type="button" data-go="cart">Add all</button>
-        </nav>
-      </section>
-
-      <section class="screen agent-screen cart-screen" data-screen="cart" aria-label="Cart">
-        <div class="chat-bubble">Great I've added them to your cart and applied a free shipping voucher.</div>
-        <header class="section-header">
-          <strong>Cart (3 items)</strong>
-          <button type="button">Edit</button>
-        </header>
-        <div class="cart-list"></div>
-        <div class="voucher-card">
-          <span>Voucher Applied</span>
-          <strong>FREE SHIPPING</strong>
-          <em>Saved $2.99</em>
-        </div>
-        <button class="primary-button full" type="button" data-go="checkout">View Checkout</button>
-      </section>
-
-      <section class="screen agent-screen checkout-screen" data-screen="checkout" aria-label="Checkout preview">
-        <div class="chat-bubble">Here's your order summary. Shall we proceed to checkout?</div>
-        <section class="summary-card">
-          <h2>Order Summary</h2>
-          <dl>
-            <div><dt>Subtotal (3 items)</dt><dd>$12.20</dd></div>
-            <div><dt>Shipping Fee</dt><dd class="muted"><s>$2.99</s></dd></div>
-            <div><dt>Voucher Discount</dt><dd class="green">-$2.99</dd></div>
-            <div class="total"><dt>Total</dt><dd>$12.20</dd></div>
-          </dl>
-        </section>
-        <div class="checkout-row"><span>Estimated Delivery</span><strong>Tomorrow, 10 May</strong></div>
-        <div class="checkout-row"><span>Payment Method</span><strong>ShopeePay</strong></div>
-        <button class="checkout-button" type="button">Proceed to Checkout</button>
-        <button class="round-button close-bottom" type="button" data-go="home" aria-label="Close">x</button>
-      </section>
-    </main>
-    <script src="ui.js"></script>
-  </body>
 </html>

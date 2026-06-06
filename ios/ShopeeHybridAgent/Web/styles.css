@@ -88,10 +88,19 @@ button {
   height: 64px;
 }
 
+@keyframes orb-pulse {
+  0%, 100% { transform: scale(1); box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.8), 0 0 0 7px rgba(126, 91, 235, 0.11), 0 14px 28px rgba(101, 73, 220, 0.32); }
+  50%      { transform: scale(1.05); box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.8), 0 0 0 14px rgba(126, 91, 235, 0.08), 0 14px 28px rgba(101, 73, 220, 0.32); }
+}
+
 .agent-orb.listening,
 .agent-orb.thinking {
   width: 120px;
   height: 120px;
+}
+
+.agent-orb.listening {
+  animation: orb-pulse 2.5s ease-in-out infinite;
 }
 
 .agent-orb span {
@@ -139,6 +148,9 @@ button {
   background: #fbfaff;
   color: #464060;
   box-shadow: 0 10px 22px rgba(64, 45, 118, 0.08);
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .icon-button.ghost {
@@ -159,12 +171,22 @@ button {
   background: radial-gradient(circle, rgba(112, 84, 226, 0.1) 0 19%, transparent 20% 100%);
 }
 
+@keyframes wave-motion {
+  0%, 100% { transform: scaleY(1); opacity: 0.8; }
+  50%      { transform: scaleY(1.4); opacity: 1; }
+}
+
 .wave {
   width: 74px;
   height: 60px;
   opacity: 0.8;
   background: repeating-linear-gradient(90deg, transparent 0 10px, #7a63eb 10px 14px, transparent 14px 22px);
   mask-image: radial-gradient(ellipse at center, black 0 55%, transparent 70%);
+  animation: wave-motion 1.2s ease-in-out infinite alternate;
+}
+
+.wave.right {
+  animation-delay: 0.3s;
 }
 
 .agent-copy {
@@ -185,13 +207,13 @@ button {
 
 .bottom-actions {
   position: absolute;
-  left: 18px;
-  right: 18px;
-  bottom: calc(26px + env(safe-area-inset-bottom));
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  left: 0;
+  right: 0;
+  bottom: calc(48px + env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 16px;
+  gap: 32px;
 }
 
 .primary-mic,
@@ -205,6 +227,11 @@ button {
 }
 
 .primary-mic {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 76px;
   height: 76px;
   border-radius: 50%;
@@ -247,6 +274,24 @@ button {
   height: 8px;
   border: 2px solid currentColor;
   border-radius: 50%;
+}
+
+.icon-close::before,
+.icon-close::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+}
+
+.icon-close::before {
+  transform: rotate(45deg);
+}
+
+.icon-close::after {
+  transform: rotate(-45deg);
 }
 
 .icon-gallery::after {
@@ -756,4 +801,157 @@ button {
   .product-card {
     min-height: 96px;
   }
+}
+
+/* Gemini Dark Theme */
+.agent-screen.dark-theme {
+  background: linear-gradient(180deg, #050505 0%, #050505 50%, #0a1128 100%);
+  color: #ffffff;
+}
+.dark-top-bar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  padding: calc(14px + env(safe-area-inset-top)) 24px 8px;
+  background: transparent;
+}
+.dark-icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.icon-menu {
+  width: 16px;
+  height: 2px;
+  background: currentColor;
+  position: relative;
+}
+.icon-menu::before, .icon-menu::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 16px;
+  height: 2px;
+  background: currentColor;
+}
+.icon-menu::before { top: -5px; }
+.icon-menu::after { top: 5px; }
+.icon-screen {
+  width: 16px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+  position: relative;
+}
+.icon-screen::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  right: -6px;
+  width: 24px;
+  height: 2px;
+  background: currentColor;
+  transform: rotate(45deg);
+  transform-origin: top right;
+}
+.voice-stage.gemini-style {
+  flex-direction: column;
+  justify-content: center;
+  height: 50%;
+  background: none;
+}
+.agent-bubble {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #4285f4 0%, #9b72cb 50%, #d96570 100%);
+  border-radius: 50%;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 30px rgba(155, 114, 203, 0.4);
+  animation: bubble-morph 4s infinite alternate ease-in-out;
+}
+@keyframes bubble-morph {
+  0% { 
+    border-radius: 50%;
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  33% {
+    border-radius: 60% 40% 50% 50% / 40% 50% 60% 50%;
+  }
+  66% {
+    border-radius: 50% 50% 40% 60% / 50% 40% 50% 60%;
+  }
+  100% { 
+    border-radius: 40% 60% 50% 50% / 60% 50% 40% 50%;
+    transform: scale(1.15) rotate(10deg);
+    filter: brightness(1.2);
+  }
+}
+.voice-stage.gemini-style h1 {
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: -0.5px;
+}
+.gemini-actions {
+  gap: 12px;
+  bottom: calc(40px + env(safe-area-inset-bottom));
+}
+.gemini-visualizer {
+  width: 110px;
+  height: 54px;
+  border-radius: 27px;
+  background: #0b0f19;
+  position: relative;
+  overflow: hidden;
+  margin: 0 4px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: inset 0 -10px 20px rgba(66, 133, 244, 0.2);
+  animation: visualizer-glow 2s infinite alternate;
+}
+@keyframes visualizer-glow {
+  0% { box-shadow: inset 0 -5px 15px rgba(66, 133, 244, 0.1); }
+  100% { box-shadow: inset 0 -20px 40px rgba(66, 133, 244, 0.4); }
+}
+.gemini-visualizer .glow-core {
+  width: 70%;
+  height: 30px;
+  background: linear-gradient(90deg, #4285f4, #8ab4f8, #4285f4);
+  border-radius: 50%;
+  filter: blur(14px);
+  transform: translateY(12px);
+  animation: core-pulse 1.5s infinite alternate ease-in-out;
+}
+@keyframes core-pulse {
+  0% { transform: translateY(14px) scaleX(0.8); opacity: 0.5; }
+  100% { transform: translateY(6px) scaleX(1.1); opacity: 1; }
+}
+.icon-mic-outline::before {
+  content: "";
+  width: 10px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-radius: 6px;
+}
+.icon-mic-outline::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 8px;
+  border-bottom: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  border-radius: 0 0 10px 10px;
+  transform: translateY(7px);
 }
