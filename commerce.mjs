@@ -21,6 +21,8 @@ const DELIVERY_RANK = {
   standard: 1
 };
 
+const REPLENISHABLE_CATEGORIES = new Set(["beauty", "grocery"]);
+
 const CATEGORY_HINTS = [
   {
     category: "home_repair",
@@ -135,6 +137,93 @@ export function classifyNeed({ message = "", imageContext = null } = {}) {
     searchTerms: [...new Set(searchTerms)].slice(0, 10),
     nextBestTool: "search_catalog"
   };
+}
+
+export function analyzeSurroundings({
+  question = "",
+  userText = "",
+  imageContext = null,
+  imageDataUrl = "",
+  imageBase64 = "",
+  imageUrl = "",
+  captureError = null
+} = {}) {
+  const text = [question, userText, imageContext?.summary].filter(Boolean).join(" ");
+  const category = inferCategory(text);
+  const categoryTerms = CATEGORY_HINTS.find((hint) => hint.category === category)?.terms || [];
+  const hasImage = Boolean(imageDataUrl || imageBase64 || imageUrl);
+  const visualClues = buildVisualClues({ category, text, categoryTerms });
+  const suggestedSearchTerms = buildSurroundingsSearchTerms({ category, text, categoryTerms });
+
+  return {
+    summary: buildSurroundingsSummary({ category, text, hasImage, captureError }),
+    visualClues,
+    suggestedSearchTerms,
+    detectedObjects: visualClues.map((label, index) => ({
+      label,
+      confidence: hasImage ? roundMoney(Math.max(0.35, 0.68 - index * 0.08)) : 0
+    })),
+    possibleCategory: category,
+    measurementHints: buildMeasurementHints(category),
+    confidence: hasImage ? 0.42 : 0,
+    searchQuery: suggestedSearchTerms.join(" "),
+    nextBestTool: "classify_need",
+    source: hasImage ? "fallback_with_image" : "fallback",
+    captureError: captureError || null
+  };
+}
+
+function buildVisualClues({ category, text, categoryTerms }) {
+  const matched = categoryTerms.filter((term) => normalize(text).includes(term));
+  const defaults = {
+    home_repair: ["under-sink area", "PVC pipe", "pipe joint", "possible water leak"],
+    beauty: ["skin care item", "face routine context"],
+    fashion: ["outfit item", "color and fit context"],
+    electronics: ["device accessory", "port or charging context"],
+    grocery: ["pantry item", "replenishment context"],
+    home_decor: ["room corner", "placement and color context"]
+  };
+
+  return [...new Set([...matched, ...(defaults[category] || defaults.home_repair)])].slice(0, 6);
+}
+
+function buildSurroundingsSearchTerms({ category, text, categoryTerms }) {
+  const tokens = tokenize(text).filter((token) => token.length > 2);
+  const defaults = {
+    home_repair: ["pvc pipe", "seal tape", "waterproof sealant", "slip coupling"],
+    beauty: ["moisturizer", "sunscreen", "cleanser"],
+    fashion: ["daily outfit", "shirt", "belt"],
+    electronics: ["charger", "usb cable", "adapter"],
+    grocery: ["refill", "pantry", "household supplies"],
+    home_decor: ["storage", "lamp", "adhesive hook"]
+  };
+
+  return [...new Set([...tokens, ...categoryTerms.slice(0, 4), ...(defaults[category] || [])])].slice(0, 8);
+}
+
+function buildSurroundingsSummary({ category, text, hasImage, captureError }) {
+  if (captureError) {
+    return `Camera capture was unavailable, so this is inferred from the user's request as a ${category.replace("_", " ")} need.`;
+  }
+  if (!hasImage) {
+    return `No image was supplied; inferred a likely ${category.replace("_", " ")} need from the user's request.`;
+  }
+  if (category === "home_repair") return "Likely home repair scene with plumbing or fixture context that needs compatible parts.";
+  return `Likely ${category.replace("_", " ")} scene that needs catalog-backed recommendations.`;
+}
+
+function buildMeasurementHints(category) {
+  if (category === "home_repair") {
+    return [
+      "Check the pipe diameter before buying a coupling.",
+      "Confirm whether the leak is from a threaded joint, slip joint, or cracked pipe.",
+      "Turn off water before attempting a repair."
+    ];
+  }
+  if (category === "fashion") return ["Confirm size, fit preference, and color matching before buying."];
+  if (category === "electronics") return ["Confirm port type, wattage, and device compatibility before buying."];
+  if (category === "home_decor") return ["Confirm dimensions and surface type before buying."];
+  return ["Confirm the user's exact variant and quantity before buying."];
 }
 
 export function searchCatalog({ query = "", category = null, userId = "u_001", limit = 5 } = {}) {
@@ -276,6 +365,100 @@ function minBy(items, getter) {
 
 function maxBy(items, getter) {
   return items.reduce((best, item) => (getter(item) > getter(best) ? item : best), items[0]);
+}
+
+export function checkUserHistory({ userId = "u_001", category = null } = {}) {
+  const user = userById.get(userId);
+  if (!user) {
+    return {
+      userId,
+      requestedUserId: userId,
+      usedFallbackUser: false,
+      preferences: safeDefaultPreferences(),
+      householdContext: null,
+      pastPurchases: [],
+      reorderSuggestions: [],
+      guidance: category
+        ? `No user profile found and no prior ${category.replace("_", " ")} purchases are available; continue with catalog search.`
+        : "No user profile found; continue with classification and catalog search."
+    };
+  }
+
+  const today = new Date();
+  const orderHistory = user.order_history || [];
+  const filteredHistory = category
+    ? orderHistory.filter((order) => order.category === category)
+    : orderHistory;
+
+  const pastPurchases = filteredHistory
+    .map((order) => {
+      const product = productById.get(order.product_id);
+      if (!product) return null;
+      const purchasedAt = new Date(order.purchased_at);
+      return {
+        product: enrichProduct(product),
+        purchasedAt: order.purchased_at,
+        daysSince: daysBetween(purchasedAt, today),
+        category: order.category,
+        quantity: order.quantity || 1,
+        satisfaction: order.satisfaction ?? null
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => new Date(b.purchasedAt) - new Date(a.purchasedAt));
+
+  const reorderSuggestions = pastPurchases
+    .filter((purchase) => REPLENISHABLE_CATEGORIES.has(purchase.category) && purchase.daysSince >= 30)
+    .map((purchase) => ({
+      productId: purchase.product.id,
+      title: purchase.product.title,
+      category: purchase.category,
+      daysSince: purchase.daysSince,
+      reason: `${purchase.title || purchase.product.title} was purchased ${purchase.daysSince} days ago and ${purchase.category.replace("_", " ")} items are likely replenishable.`
+    }));
+
+  return {
+    userId: user.user_id,
+    requestedUserId: userId,
+    usedFallbackUser: false,
+    preferences: user.preferences || safeDefaultPreferences(),
+    householdContext: user.household_context || null,
+    pastPurchases,
+    reorderSuggestions,
+    guidance: buildHistoryGuidance({ category, pastPurchases, reorderSuggestions, user })
+  };
+}
+
+function daysBetween(start, end) {
+  if (Number.isNaN(start.getTime())) return null;
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return Math.max(0, Math.floor((end.getTime() - start.getTime()) / msPerDay));
+}
+
+function safeDefaultPreferences() {
+  return {
+    delivery_priority: "fast",
+    budget_sensitivity: "medium",
+    preferred_sellers: [],
+    preferred_payment: "ShopeePay",
+    avoid: []
+  };
+}
+
+function buildHistoryGuidance({ category, pastPurchases, reorderSuggestions, user }) {
+  if (reorderSuggestions.length) {
+    return `Mention likely replenishment options before searching. ${reorderSuggestions[0].title} is a strong reorder candidate.`;
+  }
+
+  if (pastPurchases.length) {
+    return `Use these past purchases to respect the user's preferences and avoid duplicate recommendations.`;
+  }
+
+  if (category) {
+    return `No prior ${category.replace("_", " ")} purchases found for ${user.name || user.user_id}; continue with catalog search.`;
+  }
+
+  return `No relevant purchase history found; continue with classification and catalog search.`;
 }
 
 export function addToCart({ productId, productIds = [], quantity = 1, userId = "u_001" } = {}) {
@@ -475,6 +658,10 @@ export function getBootstrap({ userId = "u_001" } = {}) {
 
 export function dispatchTool(name, args = {}) {
   switch (name) {
+    case "check_user_history":
+      return checkUserHistory(args);
+    case "analyze_surroundings":
+      return analyzeSurroundings(args);
     case "classify_need":
       return classifyNeed(args);
     case "search_catalog":
@@ -498,6 +685,35 @@ export function dispatchTool(name, args = {}) {
 
 export function getToolDefinitions() {
   return [
+    {
+      type: "function",
+      name: "check_user_history",
+      description: "Look up user preferences and past purchases for personalization, reorder detection, and duplicate avoidance.",
+      parameters: {
+        type: "object",
+        properties: {
+          userId: { type: "string", description: "The user profile ID. Defaults to u_001." },
+          category: { type: "string", enum: ["home_repair", "beauty", "fashion", "electronics", "grocery", "home_decor"] }
+        }
+      }
+    },
+    {
+      type: "function",
+      name: "analyze_surroundings",
+      description: "Analyze the user's camera snapshot or visual context and return structured shopping clues before catalog search.",
+      parameters: {
+        type: "object",
+        properties: {
+          question: { type: "string", description: "What the user wants to understand from the scene." },
+          userText: { type: "string", description: "Optional spoken context from the user." },
+          imageDataUrl: { type: "string", description: "JPEG/PNG/WebP data URL captured by the client." },
+          imageBase64: { type: "string", description: "Base64-encoded image without the data URL prefix." },
+          imageUrl: { type: "string", description: "Fully-qualified URL for an image to analyze." },
+          mimeType: { type: "string", description: "Image MIME type, usually image/jpeg." },
+          userId: { type: "string" }
+        }
+      }
+    },
     {
       type: "function",
       name: "classify_need",

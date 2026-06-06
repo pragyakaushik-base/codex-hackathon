@@ -34,6 +34,8 @@ const voiceStatus = document.querySelector('[data-voice-status]');
 const activityList = document.querySelector('[data-agent-activity]');
 const activitySummary = document.querySelector('[data-agent-activity-summary]');
 const activitySteps = [
+  { tool: 'check_user_history', label: 'Checking your shopping history' },
+  { tool: 'analyze_surroundings', label: 'Analyzing camera view' },
   { tool: 'classify_need', label: 'Understanding your request' },
   { tool: 'search_catalog', label: 'Searching Shopee catalog' },
   { tool: 'recommend_bundle', label: 'Finding useful add-ons' },
@@ -213,7 +215,7 @@ function renderActivity() {
 
   const hasProgress = activitySteps.some((step) => activityState.get(step.tool) !== 'idle');
   let visibleSteps = activitySteps.filter((step) => {
-    if (!hasProgress) return ['classify_need', 'search_catalog', 'recommend_bundle'].includes(step.tool);
+    if (!hasProgress) return ['check_user_history', 'classify_need', 'search_catalog'].includes(step.tool);
     return activityState.get(step.tool) !== 'idle';
   });
 
@@ -488,6 +490,10 @@ async function runRealtimeTool(functionCall) {
   setToolActivity(functionCall.name, 'active');
   setVoiceStatus(`Running ${functionCall.name.replaceAll('_', ' ')}...`);
 
+  if (functionCall.name === 'analyze_surroundings') {
+    await enrichSurroundingsArgs(args);
+  }
+
   const response = await postJson('/api/realtime-tool', {
     name: functionCall.name,
     arguments: args
@@ -508,6 +514,12 @@ async function runRealtimeTool(functionCall) {
 }
 
 async function applyToolResult(name, result) {
+  if (name === 'analyze_surroundings') {
+    const summary = result.summary || 'Visual context captured.';
+    setVoiceStatus(summary);
+    if (result.possibleCategory === 'home_repair') go('thinking');
+  }
+
   if (name === 'search_catalog') {
     products = (result.results || []).map((entry) => entry.product);
     if (products.length) go('suggestions');
@@ -538,6 +550,82 @@ async function applyToolResult(name, result) {
   }
 
   renderProducts();
+}
+
+async function enrichSurroundingsArgs(args) {
+  if (args.imageDataUrl || args.imageBase64 || args.imageUrl) return args;
+
+  setVoiceStatus('Opening camera for a quick look...');
+  try {
+    const frame = await captureCameraFrame();
+    args.imageDataUrl = frame.imageDataUrl;
+    args.mimeType = frame.mimeType;
+    setVoiceStatus('Camera view captured. Analyzing...');
+  } catch (error) {
+    console.warn('Camera capture unavailable', error);
+    args.captureError = voiceErrorMessage(error);
+    setVoiceStatus('Camera unavailable. I will infer from your request.');
+  }
+
+  return args;
+}
+
+async function captureCameraFrame() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    throw new Error('camera is not available in this web view.');
+  }
+
+  let stream = null;
+  let video = null;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        facingMode: { ideal: 'environment' },
+        width: { ideal: 960 },
+        height: { ideal: 1280 }
+      }
+    });
+
+    video = document.createElement('video');
+    video.muted = true;
+    video.playsInline = true;
+    video.srcObject = stream;
+    await video.play();
+    await waitForVideoFrame(video);
+
+    const maxEdge = 720;
+    const sourceWidth = video.videoWidth || 720;
+    const sourceHeight = video.videoHeight || 720;
+    const scale = Math.min(1, maxEdge / Math.max(sourceWidth, sourceHeight));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(sourceWidth * scale));
+    canvas.height = Math.max(1, Math.round(sourceHeight * scale));
+    const context = canvas.getContext('2d');
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    return {
+      imageDataUrl: canvas.toDataURL('image/jpeg', 0.82),
+      mimeType: 'image/jpeg'
+    };
+  } finally {
+    stream?.getTracks().forEach((track) => track.stop());
+    if (video) video.srcObject = null;
+  }
+}
+
+function waitForVideoFrame(video) {
+  if ('requestVideoFrameCallback' in video) {
+    return new Promise((resolve) => video.requestVideoFrameCallback(() => resolve()));
+  }
+
+  return new Promise((resolve) => {
+    if (video.readyState >= 2) {
+      resolve();
+      return;
+    }
+    video.addEventListener('loadeddata', () => resolve(), { once: true });
+  });
 }
 
 async function addLastBundleToCart() {

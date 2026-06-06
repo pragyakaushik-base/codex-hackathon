@@ -5,8 +5,10 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   addToCart,
+  analyzeSurroundings,
   applyBestVoucher,
   checkoutPreview,
+  checkUserHistory,
   classifyNeed,
   compareProducts,
   dispatchTool,
@@ -27,6 +29,8 @@ const port = Number(process.env.PORT || 3000);
 const webRoot = path.join(__dirname, "ios", "ShopeeHybridAgent", "Web");
 
 const TOOL_ROUTES = {
+  "/api/tools/check-user-history": checkUserHistory,
+  "/api/tools/analyze-surroundings": analyzeSurroundingsWithVision,
   "/api/tools/classify-need": classifyNeed,
   "/api/tools/search-catalog": searchCatalog,
   "/api/tools/recommend-bundle": recommendBundle,
@@ -69,14 +73,14 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === "POST" && url.pathname === "/api/realtime-tool") {
       const body = await readJsonBody(req);
-      const result = dispatchTool(body.name, body.arguments || {});
+      const result = await dispatchRealtimeTool(body.name, body.arguments || {});
       sendJson(res, { name: body.name, result });
       return;
     }
 
     if (req.method === "POST" && TOOL_ROUTES[url.pathname]) {
       const body = await readJsonBody(req);
-      sendJson(res, TOOL_ROUTES[url.pathname](body));
+      sendJson(res, await TOOL_ROUTES[url.pathname](body));
       return;
     }
 
@@ -174,6 +178,208 @@ async function createRealtimeSession(req, res) {
   sendText(res, text, 200, "application/sdp");
 }
 
+async function dispatchRealtimeTool(name, args) {
+  if (name === "analyze_surroundings") {
+    return analyzeSurroundingsWithVision(args);
+  }
+  return dispatchTool(name, args);
+}
+
+async function analyzeSurroundingsWithVision(args = {}) {
+  const fallback = analyzeSurroundings(args);
+  const imageUrl = normalizeVisionImageInput(args);
+
+  if (!imageUrl) {
+    return fallback;
+  }
+
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    return {
+      ...fallback,
+      source: "fallback",
+      visionStatus: "openai_api_key_missing"
+    };
+  }
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "OpenAI-Safety-Identifier": process.env.OPENAI_SAFETY_IDENTIFIER || args.userId || "demo-user"
+      },
+      body: JSON.stringify({
+        model: process.env.OPENAI_VISION_MODEL || "gpt-4.1-mini",
+        input: [
+          {
+            role: "user",
+            content: [
+              { type: "input_text", text: buildVisionPrompt(args) },
+              { type: "input_image", image_url: imageUrl, detail: "low" }
+            ]
+          }
+        ],
+        max_output_tokens: 650
+      })
+    });
+
+    const text = await response.text();
+    if (!response.ok) {
+      console.error("Vision analysis failed:", text);
+      return {
+        ...fallback,
+        source: "fallback",
+        visionStatus: "vision_api_error",
+        visionError: safeVisionError(text)
+      };
+    }
+
+    const payload = safeJson(text) || {};
+    const outputText = extractOutputText(payload);
+    const parsed = parseJsonObject(outputText);
+    if (!parsed) {
+      return {
+        ...fallback,
+        source: "fallback",
+        visionStatus: "vision_output_unparseable",
+        rawVisionSummary: outputText?.slice(0, 500) || ""
+      };
+    }
+
+    return normalizeVisionResult(parsed, fallback);
+  } catch (error) {
+    console.error("Vision analysis unavailable:", error);
+    return {
+      ...fallback,
+      source: "fallback",
+      visionStatus: "vision_request_failed",
+      visionError: error.message || "Vision request failed."
+    };
+  }
+}
+
+function normalizeVisionImageInput(args = {}) {
+  if (args.imageDataUrl && /^data:image\/(png|jpeg|jpg|webp|gif);base64,/i.test(args.imageDataUrl)) {
+    return args.imageDataUrl;
+  }
+  if (args.imageBase64) {
+    const mimeType = args.mimeType || "image/jpeg";
+    return `data:${mimeType};base64,${args.imageBase64}`;
+  }
+  if (args.imageUrl && /^https?:\/\//i.test(args.imageUrl)) {
+    return args.imageUrl;
+  }
+  return "";
+}
+
+function buildVisionPrompt(args = {}) {
+  const userContext = args.question || args.userText || "What does the user need to buy for this scene?";
+  return `
+Analyze this image for an ecommerce shopping assistant. Return only valid JSON with this exact shape:
+{
+  "summary": "short scene summary",
+  "visualClues": ["specific visual evidence"],
+  "suggestedSearchTerms": ["catalog search terms"],
+  "detectedObjects": [{"label":"object", "confidence":0.0}],
+  "possibleCategory": "home_repair|beauty|fashion|electronics|grocery|home_decor",
+  "measurementHints": ["practical checks before buying"],
+  "confidence": 0.0,
+  "searchQuery": "short query for catalog search",
+  "nextBestTool": "classify_need"
+}
+
+User context: ${userContext}
+Use practical shopping language. Do not identify people. Do not invent products, prices, sellers, stock, or discounts.
+`.trim();
+}
+
+function extractOutputText(payload) {
+  if (typeof payload.output_text === "string") return payload.output_text;
+  const chunks = [];
+  for (const item of payload.output || []) {
+    for (const content of item.content || []) {
+      if (typeof content.text === "string") chunks.push(content.text);
+    }
+  }
+  return chunks.join("\n");
+}
+
+function parseJsonObject(text = "") {
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) return null;
+    try {
+      return JSON.parse(match[0]);
+    } catch {
+      return null;
+    }
+  }
+}
+
+function normalizeVisionResult(parsed, fallback) {
+  const category = normalizeCategory(parsed.possibleCategory) || fallback.possibleCategory;
+  const visualClues = normalizeStringArray(parsed.visualClues, fallback.visualClues);
+  const suggestedSearchTerms = normalizeStringArray(parsed.suggestedSearchTerms, fallback.suggestedSearchTerms);
+  const detectedObjects = Array.isArray(parsed.detectedObjects)
+    ? parsed.detectedObjects.map((item) => normalizeDetectedObject(item)).filter(Boolean).slice(0, 8)
+    : fallback.detectedObjects;
+
+  return {
+    ...fallback,
+    summary: stringOr(parsed.summary, fallback.summary),
+    visualClues,
+    suggestedSearchTerms,
+    detectedObjects,
+    possibleCategory: category,
+    measurementHints: normalizeStringArray(parsed.measurementHints, fallback.measurementHints),
+    confidence: clampConfidence(parsed.confidence, Math.max(fallback.confidence, 0.65)),
+    searchQuery: stringOr(parsed.searchQuery, suggestedSearchTerms.join(" ")),
+    nextBestTool: parsed.nextBestTool === "search_catalog" ? "search_catalog" : "classify_need",
+    source: "vision",
+    visionStatus: "ok"
+  };
+}
+
+function normalizeStringArray(value, fallback = []) {
+  if (!Array.isArray(value)) return fallback;
+  return value.map((item) => String(item || "").trim()).filter(Boolean).slice(0, 8);
+}
+
+function normalizeDetectedObject(item) {
+  if (typeof item === "string") return { label: item, confidence: 0.5 };
+  if (!item || typeof item !== "object" || !item.label) return null;
+  return {
+    label: String(item.label),
+    confidence: clampConfidence(item.confidence, 0.5)
+  };
+}
+
+function normalizeCategory(value) {
+  const allowed = new Set(["home_repair", "beauty", "fashion", "electronics", "grocery", "home_decor"]);
+  return allowed.has(value) ? value : null;
+}
+
+function stringOr(value, fallback) {
+  const text = String(value || "").trim();
+  return text || fallback;
+}
+
+function clampConfidence(value, fallback = 0) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return fallback;
+  return Math.max(0, Math.min(1, number));
+}
+
+function safeVisionError(text) {
+  const payload = safeJson(text);
+  return payload?.error?.message || String(text || "").slice(0, 240);
+}
+
 function buildRealtimeSessionConfig() {
   return {
     type: "realtime",
@@ -206,12 +412,14 @@ Use tools for factual commerce work. Do not invent products, prices, sellers, st
 
 Tool strategy:
 1. Classify the user's need before searching the catalog.
-2. Search only the catalog tool for recommendations.
-3. Explain recommendations using factual product fields such as bestFor, tradeoffs, rating, delivery, seller, and stock.
-4. Suggest compatible bundles when the user is solving a practical task.
-5. Compare products when multiple options are plausible.
-6. Never add items to or remove items from cart without explicit user confirmation.
-7. After cart mutation, apply the best voucher and call checkout_preview.
+2. Check user history early when the request may involve replenishment, prior preferences, duplicate avoidance, or context such as home setup.
+3. If the user refers to what they are seeing, holding, pointing at, wearing, or photographing, call analyze_surroundings before classification or catalog search.
+4. Search only the catalog tool for recommendations.
+5. Explain recommendations using factual product fields such as bestFor, tradeoffs, rating, delivery, seller, and stock.
+6. Suggest compatible bundles when the user is solving a practical task.
+7. Compare products when multiple options are plausible.
+8. Never add items to or remove items from cart without explicit user confirmation.
+9. After cart mutation, apply the best voucher and call checkout_preview.
 
 Keep spoken replies concise and demo-friendly. Ask one clear follow-up only when required.
 `.trim();

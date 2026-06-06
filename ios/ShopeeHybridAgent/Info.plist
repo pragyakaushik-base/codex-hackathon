@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>AgentBaseURL</key>
-  <string>https://fb6d-118-201-124-124.ngrok-free.app</string>
+	<string>$(AGENT_BASE_URL)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -29,6 +29,8 @@
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>The shopping agent connects to the local demo server running on this network.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>The shopping agent uses the camera to understand what you are looking at and recommend suitable products.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>The shopping agent uses the microphone so you can speak your shopping request.</string>
 	<key>UIApplicationSceneManifest</key>

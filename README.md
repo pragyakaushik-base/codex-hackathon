@@ -22,19 +22,27 @@ The server prints one or more `iPhone LAN URL` lines. Use the URL that matches y
 http://10.22.64.15:3000
 ```
 
-3. For a physical iPhone, set `AgentBaseURL` in `ios/ShopeeHybridAgent/Info.plist` to that LAN URL. Confirm the phone can open this in Safari:
+3. For the iOS Simulator, the app defaults to `http://127.0.0.1:3000`. For a physical iPhone, set the Xcode build setting `AGENT_BASE_URL` to either the LAN URL printed by the server or the current ngrok forwarding URL. Do not edit `Info.plist` directly. Confirm the phone can open the chosen URL in Safari:
 
 ```text
 http://10.22.64.15:3000/api/bootstrap
 ```
 
+or:
+
+```text
+https://your-current-ngrok-url.ngrok-free.app/api/bootstrap
+```
+
 4. Open `ios/ShopeeHybridAgent.xcodeproj` in Xcode and run `ShopeeHybridAgent`.
 
-The iOS app loads `AgentBaseURL` in its `WKWebView` when the server is reachable, with the bundled static mock as a fallback. Tap the floating agent button, then tap the microphone button to start the OpenAI Realtime WebRTC voice session.
+The iOS app loads `AgentBaseURL` from the `AGENT_BASE_URL` build setting in its `WKWebView` when the server is reachable, with the bundled static mock as a fallback. Tap the floating agent button, then tap the microphone button to start the OpenAI Realtime WebRTC voice session.
 
 ## Implemented Agent Tools
 
 - `classify_need`
+- `check_user_history`
+- `analyze_surroundings`
 - `search_catalog`
 - `recommend_bundle`
 - `compare_products`
