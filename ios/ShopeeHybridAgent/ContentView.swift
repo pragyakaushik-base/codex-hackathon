@@ -381,6 +381,20 @@ struct HybridAgentWebView: UIViewRepresentable {
                 if let webView {
                     syncStateIfNeeded(to: webView)
                 }
+            case "screen_changed":
+                guard let screen = body["screen"] as? String else { return }
+                Task { @MainActor in
+                    switch screen {
+                    case "camera":
+                        viewModel.showingWebOverlay = false
+                        viewModel.showingAgent = true
+                    case "home":
+                        viewModel.showingWebOverlay = true
+                    default:
+                        viewModel.showingWebOverlay = true
+                        viewModel.showingAgent = true
+                    }
+                }
             case "cameraTapped":
                 Task { @MainActor in
                     viewModel.showingWebOverlay = false

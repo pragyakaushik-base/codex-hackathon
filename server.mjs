@@ -397,6 +397,10 @@ function buildRealtimeSessionConfig() {
     instructions: REALTIME_INSTRUCTIONS,
     audio: {
       input: {
+        transcription: {
+          model: process.env.OPENAI_REALTIME_TRANSCRIBE_MODEL || "gpt-4o-mini-transcribe",
+          language: "en"
+        },
         turn_detection: {
           type: "server_vad",
           threshold: Number(process.env.OPENAI_REALTIME_VAD_THRESHOLD || 0.68),

@@ -6,8 +6,10 @@ let realtime = null;
 let voiceSessionStarting = false;
 let voiceStartToken = 0;
 let cameraStream = null;
+let autoVisionInFlight = false;
 
 const handledRealtimeCalls = new Set();
+const handledVisualTranscriptItems = new Set();
 const injectedApiBase = window.__AGENT_BASE_URL || '';
 const API_BASE = injectedApiBase || (location.protocol === 'file:' ? 'http://127.0.0.1:3000' : '');
 const screens = [...document.querySelectorAll('[data-screen]')];
@@ -17,6 +19,7 @@ const cartMessage = document.querySelector('[data-cart-message], [data-cart-summ
 const cartTitle = document.querySelector('[data-cart-title], [data-cart-count]');
 const clearCartButton = document.querySelector('[data-clear-cart]');
 const openCheckoutButton = document.querySelector('[data-open-checkout]');
+const cartCtaButton = document.querySelector('[data-cart-cta]');
 const voucherCard = document.querySelector('[data-voucher-card]');
 const voucherLabel = document.querySelector('[data-voucher-label]');
 const voucherCode = document.querySelector('[data-voucher-code]');
@@ -40,6 +43,8 @@ const cameraPreview = document.querySelector('.camera-preview');
 const agentInput = document.querySelector('[data-agent-input]');
 const agentSummary = document.querySelector('[data-agent-summary]');
 const statusChip = document.querySelector('[data-status-chip]');
+const recommendationCountChip = document.querySelector('[data-recommendation-count]');
+const selectionChip = document.querySelector('[data-selection-chip]');
 
 const activitySteps = [
   { tool: 'check_user_history', label: 'Checking your shopping history' },
@@ -232,6 +237,15 @@ function renderProducts() {
     statusChip.textContent = nativeState.planeDetected ? 'Desk detected' : 'Desk not detected';
   }
 
+  if (recommendationCountChip) {
+    recommendationCountChip.textContent = `${visibleProducts.length} recommendation${visibleProducts.length === 1 ? '' : 's'}`;
+  }
+
+  if (selectionChip) {
+    const selectedProduct = visibleProducts.find((product) => product.id === selectedProductID);
+    selectionChip.textContent = selectedProduct ? `Selected: ${selectedProduct.title}` : 'No selection';
+  }
+
   productList.innerHTML = visibleProducts.map((product, index) => `
     <article class="product-card ${product.id === selectedProductID ? 'is-selected' : ''}">
       ${productMedia(product, index)}
@@ -284,6 +298,11 @@ function renderCartSummary() {
 
   if (clearCartButton) clearCartButton.disabled = itemCount === 0;
   if (openCheckoutButton) openCheckoutButton.disabled = itemCount === 0;
+  if (cartCtaButton) {
+    cartCtaButton.textContent = itemCount
+      ? `View Checkout${cartCheckout?.total ? ` · ${formatMoney(cartCheckout.total)}` : ''}`
+      : 'View Checkout';
+  }
 
   const voucher = cartCheckout?.voucher;
   const discount = Number(cartCheckout?.voucherDiscount || 0);
@@ -462,6 +481,16 @@ document.addEventListener('click', (event) => {
   const commandButton = event.target.closest('[data-agent-command]');
   if (commandButton) {
     submitAgentPrompt(commandButton.dataset.agentCommand || '');
+    return;
+  }
+
+  const focusSelectedButton = event.target.closest('[data-focus-selected]');
+  if (focusSelectedButton) {
+    const visibleProducts = currentProducts();
+    const selectedProduct = visibleProducts.find((product) => product.id === nativeState.selectedProductID) || visibleProducts[0];
+    if (selectedProduct) {
+      submitAgentPrompt(`Focus on ${selectedProduct.title}.`);
+    }
     return;
   }
 
@@ -664,6 +693,12 @@ async function handleRealtimeMessage(event) {
   const payload = JSON.parse(event.data);
   console.debug('Realtime event', payload);
 
+  if (payload.type === 'conversation.item.input_audio_transcription.completed' && payload.transcript) {
+    maybeHandleVisualTranscript(payload).catch((error) => {
+      console.warn('Auto visual transcript handling failed', error);
+    });
+  }
+
   if (payload.type === 'response.output_item.done' && payload.item?.type === 'function_call') {
     await runRealtimeTool(payload.item);
   }
@@ -683,6 +718,55 @@ async function handleRealtimeMessage(event) {
   if (payload.type === 'response.done') {
     setVoiceStatus('Listening for the next step.');
   }
+}
+
+async function maybeHandleVisualTranscript(payload) {
+  const itemId = payload.item_id || payload.item?.id || '';
+  const transcript = String(payload.transcript || '').trim();
+  if (!transcript || !looksLikeVisualQuestion(transcript)) return;
+  if (itemId && handledVisualTranscriptItems.has(itemId)) return;
+  if (autoVisionInFlight) return;
+
+  if (itemId) handledVisualTranscriptItems.add(itemId);
+  autoVisionInFlight = true;
+  setToolActivity('analyze_surroundings', 'active');
+  setVoiceStatus('Looking at your surroundings...');
+
+  try {
+    const args = { question: transcript, userText: transcript, userId: 'u_001' };
+    await enrichSurroundingsArgs(args);
+
+    const response = await postJson('/api/realtime-tool', {
+      name: 'analyze_surroundings',
+      arguments: args
+    });
+
+    setToolActivity('analyze_surroundings', 'done');
+    await applyToolResult('analyze_surroundings', response.result);
+    sendTextPrompt(`The user asked: "${transcript}". Use this live visual analysis to answer directly and do not ask for a camera feed: ${JSON.stringify(response.result)}`);
+  } catch (error) {
+    setToolActivity('analyze_surroundings', 'done');
+    console.warn('Auto surroundings analysis failed', error);
+  } finally {
+    autoVisionInFlight = false;
+  }
+}
+
+function looksLikeVisualQuestion(text) {
+  const normalized = text.toLowerCase();
+  return [
+    'what am i looking at',
+    'what am i seeing',
+    'what do you see',
+    'analyze my surroundings',
+    'analyse my surroundings',
+    'analyze the surroundings',
+    'analyse the surroundings',
+    'what is this',
+    'what is in front of me',
+    'look at this',
+    'can you see this'
+  ].some((phrase) => normalized.includes(phrase));
 }
 
 async function runRealtimeTool(functionCall) {

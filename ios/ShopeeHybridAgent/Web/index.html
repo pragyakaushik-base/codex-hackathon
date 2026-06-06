@@ -114,13 +114,13 @@
       <div class="chat-bubble" data-agent-summary>I found the best matches for your leak. Here are the top options.</div>
       <div class="chips" aria-label="Filters">
         <span data-status-chip>Desk not detected</span>
-        <span>AR Ready</span>
-        <span>Native Sync</span>
+        <span data-recommendation-count>0 recommendations</span>
+        <span data-selection-chip>No selection</span>
       </div>
       <div class="product-list"></div>
       <nav class="bottom-actions compact">
         <button class="pill-button" type="button" data-native-action="place">Place In AR</button>
-        <button class="pill-button" type="button" data-agent-command="I like the second one.">Choose #2</button>
+        <button class="pill-button" type="button" data-focus-selected>Focus Selected</button>
         <button class="primary-button" type="button" data-native-action="cart" data-go="cart">Add Selected</button>
       </nav>
     </section>
@@ -137,7 +137,7 @@
         <strong data-voucher-code>No eligible voucher</strong>
         <em data-voucher-saving data-cart-total>Keep shopping to unlock savings</em>
       </div>
-      <button class="primary-button full" type="button" data-open-checkout>View Checkout</button>
+      <button class="primary-button full" type="button" data-open-checkout data-cart-cta>View Checkout</button>
     </section>
 
     <section class="screen agent-screen checkout-screen" data-screen="checkout" aria-label="Checkout preview">

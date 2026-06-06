@@ -1164,10 +1164,23 @@ button:disabled {
   margin-top: 12px;
 }
 
+.suggestions-screen.is-active {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cart-screen.is-active {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .chips {
   display: flex;
   gap: 10px;
   margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 .chips span,
@@ -1183,6 +1196,11 @@ button:disabled {
 .product-list {
   display: grid;
   gap: 12px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 2px 12px 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 .product-card,
@@ -1315,7 +1333,15 @@ button:disabled {
 }
 
 .bottom-actions.compact {
+  position: static;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  display: grid;
   grid-template-columns: 1fr 1fr 1.2fr;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 0 0 calc(8px + env(safe-area-inset-bottom));
 }
 
 .section-header,
@@ -1339,6 +1365,11 @@ button:disabled {
 .cart-list {
   display: grid;
   gap: 10px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 2px 12px 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 .cart-item {
