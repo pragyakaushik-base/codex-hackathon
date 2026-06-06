@@ -305,8 +305,35 @@ document.addEventListener('click', (event) => {
   go(next);
 });
 
-window.syncNativeState = function syncNativeState() {
+window.syncNativeState = function syncNativeState(nextState = {}) {
+  if (Array.isArray(nextState.recommendations) && nextState.recommendations.length) {
+    products = nextState.recommendations.map((product) => ({
+      ...product,
+      category: product.category || 'electronics',
+      reviewCount: product.reviewCount || 0
+    }));
+    lastBundleIds = products.map((product) => product.id).filter(Boolean);
+  }
+
+  if (Array.isArray(nextState.cart) && nextState.cart.length) {
+    cartLines = nextState.cart.map((product) => ({
+      product: {
+        ...product,
+        category: product.category || 'electronics',
+        reviewCount: product.reviewCount || 0
+      },
+      quantity: 1,
+      lineTotal: Number(product.price || 0)
+    }));
+  }
+
   renderProducts();
+
+  if (Array.isArray(nextState.recommendations) && nextState.recommendations.length) {
+    go('suggestions', { autoStartVoice: false });
+  } else if (Array.isArray(nextState.cart) && nextState.cart.length) {
+    go('cart', { autoStartVoice: false });
+  }
 };
 
 async function bootstrap() {

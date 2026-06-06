@@ -142,7 +142,7 @@
     "sellerId": "S002",
     "delivery": "same_day",
     "stock": 70,
-    "imageUrl": "assets/sk005.jpg",
+    "imageUrl": "assets/sk005.png",
     "attributes": {
       "skinType": "oily_combination",
       "fragranceFree": false,
@@ -170,7 +170,7 @@
     "sellerId": "S002",
     "delivery": "next_day",
     "stock": 42,
-    "imageUrl": "assets/sk006.jpg",
+    "imageUrl": "assets/sk006.png",
     "attributes": {
       "skinType": "dry",
       "fragranceFree": true,
@@ -198,7 +198,7 @@
     "sellerId": "S002",
     "delivery": "next_day",
     "stock": 48,
-    "imageUrl": "assets/sk007.jpg",
+    "imageUrl": "assets/sk007.png",
     "attributes": {
       "skinType": "sensitive",
       "fragranceFree": true,
@@ -226,7 +226,7 @@
     "sellerId": "S002",
     "delivery": "standard",
     "stock": 35,
-    "imageUrl": "assets/sk008.jpg",
+    "imageUrl": "assets/sk008.png",
     "attributes": {
       "skinType": "normal_combination",
       "fragranceFree": false,
@@ -254,7 +254,7 @@
     "sellerId": "S002",
     "delivery": "same_day",
     "stock": 92,
-    "imageUrl": "assets/sk009.jpg",
+    "imageUrl": "assets/sk009.png",
     "attributes": {
       "skinType": "normal",
       "fragranceFree": false,

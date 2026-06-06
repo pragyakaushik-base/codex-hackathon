@@ -1190,8 +1190,20 @@ button:disabled {
   margin-top: 12px;
 }
 
+.suggestions-screen {
+  display: none;
+  height: 100%;
+  overflow: hidden;
+}
+
+.suggestions-screen.is-active {
+  display: flex;
+  flex-direction: column;
+}
+
 .chips {
   display: flex;
+  flex-shrink: 0;
   gap: 10px;
   margin-bottom: 16px;
 }
@@ -1209,6 +1221,15 @@ button:disabled {
 .product-list {
   display: grid;
   gap: 12px;
+}
+
+.suggestions-screen .product-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 116px;
 }
 
 .product-card,
@@ -1342,6 +1363,10 @@ button:disabled {
 
 .bottom-actions.compact {
   grid-template-columns: 1fr 1fr 1.2fr;
+}
+
+.suggestions-screen .bottom-actions.compact {
+  flex-shrink: 0;
 }
 
 .section-header,

@@ -407,11 +407,11 @@ function buildRealtimeSessionConfig() {
       input: {
         turn_detection: {
           type: "server_vad",
-          threshold: Number(process.env.OPENAI_REALTIME_VAD_THRESHOLD || 0.68),
-          prefix_padding_ms: Number(process.env.OPENAI_REALTIME_VAD_PREFIX_PADDING_MS || 500),
-          silence_duration_ms: Number(process.env.OPENAI_REALTIME_VAD_SILENCE_MS || 900),
+          threshold: Number(process.env.OPENAI_REALTIME_VAD_THRESHOLD || 0.5),
+          prefix_padding_ms: Number(process.env.OPENAI_REALTIME_VAD_PREFIX_PADDING_MS || 300),
+          silence_duration_ms: Number(process.env.OPENAI_REALTIME_VAD_SILENCE_MS || 500),
           create_response: true,
-          interrupt_response: true
+          interrupt_response: envFlag("OPENAI_REALTIME_INTERRUPT_RESPONSE", true)
         }
       },
       output: {
@@ -421,6 +421,12 @@ function buildRealtimeSessionConfig() {
     tool_choice: "auto",
     tools: getToolDefinitions()
   };
+}
+
+function envFlag(name, fallback = false) {
+  const value = process.env[name];
+  if (value == null || value === "") return fallback;
+  return /^(1|true|yes|on)$/i.test(value);
 }
 
 const REALTIME_INSTRUCTIONS = `
