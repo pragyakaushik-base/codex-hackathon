@@ -310,6 +310,48 @@ export function addToCart({ productId, productIds = [], quantity = 1, userId = "
   };
 }
 
+export function removeFromCart({ productId, productIds = [], quantity = null, userId = "u_001" } = {}) {
+  const ids = productIds.length ? productIds : [productId];
+  const session = getSession(userId);
+  const removed = [];
+  const missingProductIds = [];
+  const removeAll = quantity === null || quantity === undefined;
+  const safeQuantity = removeAll ? null : Math.max(1, Number(quantity) || 1);
+
+  for (const id of ids.filter(Boolean)) {
+    const lineIndex = session.cart.findIndex((item) => item.productId === id);
+    if (lineIndex === -1) {
+      missingProductIds.push(id);
+      continue;
+    }
+
+    const line = session.cart[lineIndex];
+    const product = productById.get(id);
+    const removedQuantity = removeAll ? line.quantity : Math.min(safeQuantity, line.quantity);
+
+    if (removeAll || line.quantity <= safeQuantity) {
+      session.cart.splice(lineIndex, 1);
+    } else {
+      line.quantity -= safeQuantity;
+    }
+
+    if (product) {
+      removed.push({
+        product: enrichProduct(product),
+        quantity: removedQuantity
+      });
+    }
+  }
+
+  return {
+    userId,
+    removed,
+    missingProductIds,
+    cart: hydrateCart(session.cart),
+    cartCount: session.cart.reduce((sum, item) => sum + item.quantity, 0)
+  };
+}
+
 export function applyBestVoucher({ userId = "u_001", cart = null } = {}) {
   const cartLines = cart ? hydrateCart(cart) : hydrateCart(getSession(userId).cart);
   const subtotal = cartSubtotal(cartLines);
@@ -362,7 +404,7 @@ export function checkoutPreview({ userId = "u_001", voucherCode = null } = {}) {
   const voucherResult = voucherCode
     ? applySpecificVoucher(voucherCode, cart)
     : applyBestVoucher({ userId });
-  const shippingFee = 2.99;
+  const shippingFee = cart.length ? 2.99 : 0;
   const shippingDiscount = voucherResult.bestVoucher?.discountType === "free_shipping" ? Math.min(shippingFee, voucherResult.discount) : 0;
   const itemDiscount = voucherResult.bestVoucher?.discountType === "free_shipping" ? 0 : voucherResult.discount;
   const total = roundMoney(subtotal + shippingFee - shippingDiscount - itemDiscount);
@@ -443,6 +485,8 @@ export function dispatchTool(name, args = {}) {
       return compareProducts(args);
     case "add_to_cart":
       return addToCart(args);
+    case "remove_from_cart":
+      return removeFromCart(args);
     case "apply_best_voucher":
       return applyBestVoucher(args);
     case "checkout_preview":
@@ -517,6 +561,20 @@ export function getToolDefinitions() {
           productId: { type: "string" },
           productIds: { type: "array", items: { type: "string" } },
           quantity: { type: "number" },
+          userId: { type: "string" }
+        }
+      }
+    },
+    {
+      type: "function",
+      name: "remove_from_cart",
+      description: "Remove one or more products from the user's cart after explicit user confirmation. Omit quantity to remove the full line.",
+      parameters: {
+        type: "object",
+        properties: {
+          productId: { type: "string" },
+          productIds: { type: "array", items: { type: "string" } },
+          quantity: { type: "number", description: "Quantity to remove. Omit to remove each matching cart line completely." },
           userId: { type: "string" }
         }
       }

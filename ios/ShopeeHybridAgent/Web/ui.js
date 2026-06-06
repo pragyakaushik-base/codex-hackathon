@@ -1,7 +1,10 @@
 let products = [];
 let cartLines = [];
 let lastBundleIds = [];
+let cartCheckout = null;
 let realtime = null;
+let voiceSessionStarting = false;
+let voiceStartToken = 0;
 const handledRealtimeCalls = new Set();
 const injectedApiBase = window.__AGENT_BASE_URL || '';
 const API_BASE = injectedApiBase || (location.protocol === 'file:' ? 'http://127.0.0.1:3000' : '');
@@ -9,25 +12,62 @@ const API_BASE = injectedApiBase || (location.protocol === 'file:' ? 'http://127
 const screens = [...document.querySelectorAll('[data-screen]')];
 const productList = document.querySelector('.product-list');
 const cartList = document.querySelector('.cart-list');
+const cartMessage = document.querySelector('[data-cart-message]');
+const cartTitle = document.querySelector('[data-cart-title]');
+const clearCartButton = document.querySelector('[data-clear-cart]');
+const openCheckoutButton = document.querySelector('[data-open-checkout]');
+const voucherCard = document.querySelector('[data-voucher-card]');
+const voucherLabel = document.querySelector('[data-voucher-label]');
+const voucherCode = document.querySelector('[data-voucher-code]');
+const voucherSaving = document.querySelector('[data-voucher-saving]');
+const checkoutMessage = document.querySelector('[data-checkout-message]');
+const checkoutSubtotalLabel = document.querySelector('[data-checkout-subtotal-label]');
+const checkoutSubtotal = document.querySelector('[data-checkout-subtotal]');
+const checkoutShipping = document.querySelector('[data-checkout-shipping]');
+const checkoutDiscount = document.querySelector('[data-checkout-discount]');
+const checkoutTotal = document.querySelector('[data-checkout-total]');
+const checkoutDelivery = document.querySelector('[data-checkout-delivery]');
+const checkoutPayment = document.querySelector('[data-checkout-payment]');
+const proceedCheckoutButton = document.querySelector('[data-proceed-checkout]');
 const voiceAgentScreen = document.querySelector('.voice-agent-screen');
 const voiceStatus = document.querySelector('[data-voice-status]');
+const activityList = document.querySelector('[data-agent-activity]');
+const activitySummary = document.querySelector('[data-agent-activity-summary]');
+const activitySteps = [
+  { tool: 'classify_need', label: 'Understanding your request' },
+  { tool: 'search_catalog', label: 'Searching Shopee catalog' },
+  { tool: 'recommend_bundle', label: 'Finding useful add-ons' },
+  { tool: 'compare_products', label: 'Comparing best matches' },
+  { tool: 'add_to_cart', label: 'Adding to cart' },
+  { tool: 'remove_from_cart', label: 'Removing from cart' },
+  { tool: 'apply_best_voucher', label: 'Checking best voucher' },
+  { tool: 'checkout_preview', label: 'Preparing checkout preview' }
+];
+const activityState = new Map(activitySteps.map((step) => [step.tool, 'idle']));
 
 function postNative(event, payload = {}) {
   window.webkit?.messageHandlers?.nativeBridge?.postMessage({ event, ...payload });
 }
 
-function go(screenName) {
+function go(screenName, options = {}) {
+  const { autoStartVoice = true } = options;
   screens.forEach((screen) => {
     screen.classList.toggle('is-active', screen.dataset.screen === screenName);
   });
 
   if (screenName === 'listening') {
-    voiceAgentScreen?.classList.add('is-listening');
+    if (realtime?.peerConnection || voiceSessionStarting) {
+      voiceAgentScreen?.classList.add('is-listening');
+    }
   } else {
     voiceAgentScreen?.classList.remove('is-speaking');
   }
 
   postNative('screen_changed', { screen: screenName });
+
+  if (screenName === 'listening' && autoStartVoice) {
+    startVoiceSession({ navigate: false });
+  }
 }
 
 function productArt(product, index) {
@@ -56,40 +96,193 @@ function artColorFor(product, index) {
   return palette[index % palette.length];
 }
 
+function productMedia(product, index, size = 'large') {
+  if (product?.imageUrl) {
+    return `
+      <figure class="product-media product-media-${size}">
+        <img src="${escapeHtml(product.imageUrl)}" alt="${escapeHtml(product.title || 'Product image')}" loading="lazy" />
+      </figure>
+    `;
+  }
+
+  return `<figure class="product-media product-media-${size}">${productArt(product, index)}</figure>`;
+}
+
 function renderProducts() {
   productList.innerHTML = products.map((product, index) => `
     <article class="product-card">
-      ${productArt(product, index)}
+      ${productMedia(product, index)}
       <div>
-        <h2>${product.title}</h2>
+        <h2>${escapeHtml(product.title)}</h2>
         <strong>$${Number(product.price).toFixed(2)}</strong>
         <p><span class="star">★</span> ${product.rating} <span>(${product.reviewCount || 0})</span></p>
         <small>${formatDelivery(product.delivery)}</small>
       </div>
-      <button class="bookmark" type="button" aria-label="Save ${product.title}"></button>
+      <button class="bookmark" type="button" aria-label="Save ${escapeHtml(product.title)}"></button>
     </article>
   `).join('');
 
   cartList.innerHTML = cartLines.map((line, index) => `
     <article class="cart-item">
-      ${productArt(line.product, index)}
-      <h2>${line.product.title}</h2>
-      <strong>$${Number(line.lineTotal).toFixed(2)}</strong>
+      ${productMedia(line.product, index, 'small')}
+      <div class="cart-item-main">
+        <h2>${escapeHtml(line.product.title)}</h2>
+        <strong>$${Number(line.lineTotal).toFixed(2)}</strong>
+      </div>
       <span>x${line.quantity}</span>
+      <button class="cart-remove" type="button" data-remove-cart-item="${escapeHtml(line.product.id)}" aria-label="Remove ${escapeHtml(line.product.title)}">Remove</button>
     </article>
   `).join('');
+
+  renderCartSummary();
+  renderCheckoutSummary();
+}
+
+function renderCartSummary() {
+  const itemCount = cartLines.reduce((sum, line) => sum + (Number(line.quantity) || 0), 0);
+  if (cartTitle) cartTitle.textContent = `Cart (${itemCount} ${itemCount === 1 ? 'item' : 'items'})`;
+  if (cartMessage) {
+    if (!itemCount) {
+      cartMessage.textContent = 'Your cart is empty. Add recommended products to preview savings and checkout.';
+    } else if (cartCheckout?.voucher) {
+      cartMessage.textContent = `I found ${itemCount} ${itemCount === 1 ? 'item' : 'items'} in your cart and applied the best voucher.`;
+    } else {
+      cartMessage.textContent = `I found ${itemCount} ${itemCount === 1 ? 'item' : 'items'} in your cart. No voucher applies yet.`;
+    }
+  }
+  if (clearCartButton) clearCartButton.disabled = itemCount === 0;
+  if (openCheckoutButton) openCheckoutButton.disabled = itemCount === 0;
+
+  const voucher = cartCheckout?.voucher;
+  const discount = Number(cartCheckout?.voucherDiscount || 0);
+  if (voucherCard) voucherCard.classList.toggle('is-empty', !voucher);
+  if (voucherLabel) voucherLabel.textContent = voucher ? 'Voucher Applied' : 'Voucher';
+  if (voucherCode) voucherCode.textContent = voucher?.code || 'No eligible voucher';
+  if (voucherSaving) {
+    voucherSaving.textContent = voucher
+      ? `Saved $${discount.toFixed(2)}`
+      : itemCount ? 'No voucher applies yet' : 'Your cart is empty';
+  }
+}
+
+function renderCheckoutSummary() {
+  const checkout = cartCheckout || {
+    cart: cartLines,
+    subtotal: cartLines.reduce((sum, line) => sum + Number(line.lineTotal || 0), 0),
+    shippingFee: cartLines.length ? 2.99 : 0,
+    voucherDiscount: 0,
+    total: cartLines.reduce((sum, line) => sum + Number(line.lineTotal || 0), 0) + (cartLines.length ? 2.99 : 0),
+    estimatedDelivery: null,
+    paymentMethod: 'ShopeePay'
+  };
+  const itemCount = (checkout.cart || cartLines).reduce((sum, line) => sum + (Number(line.quantity) || 0), 0);
+  const hasItems = itemCount > 0;
+  const discount = Number(checkout.voucherDiscount || 0);
+
+  if (checkoutMessage) {
+    checkoutMessage.textContent = hasItems
+      ? "Here's your order summary. Shall we proceed to checkout?"
+      : 'Your cart is empty. Add items before checkout.';
+  }
+  if (checkoutSubtotalLabel) checkoutSubtotalLabel.textContent = `Subtotal (${itemCount} ${itemCount === 1 ? 'item' : 'items'})`;
+  if (checkoutSubtotal) checkoutSubtotal.textContent = formatMoney(checkout.subtotal || 0);
+  if (checkoutShipping) checkoutShipping.textContent = formatMoney(checkout.shippingFee || 0);
+  if (checkoutDiscount) checkoutDiscount.textContent = discount ? `-${formatMoney(discount)}` : formatMoney(0);
+  if (checkoutTotal) checkoutTotal.textContent = formatMoney(checkout.total || 0);
+  if (checkoutDelivery) checkoutDelivery.textContent = checkout.estimatedDelivery || '-';
+  if (checkoutPayment) checkoutPayment.textContent = checkout.paymentMethod || 'ShopeePay';
+  if (proceedCheckoutButton) proceedCheckoutButton.disabled = !hasItems;
+}
+
+function formatMoney(value) {
+  return `$${Number(value || 0).toFixed(2)}`;
+}
+
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[character]);
+}
+
+function renderActivity() {
+  if (!activityList) return;
+
+  const hasProgress = activitySteps.some((step) => activityState.get(step.tool) !== 'idle');
+  let visibleSteps = activitySteps.filter((step) => {
+    if (!hasProgress) return ['classify_need', 'search_catalog', 'recommend_bundle'].includes(step.tool);
+    return activityState.get(step.tool) !== 'idle';
+  });
+
+  if (hasProgress) {
+    const lastVisibleIndex = Math.max(...visibleSteps.map((step) => activitySteps.findIndex((candidate) => candidate.tool === step.tool)));
+    const nextStep = activitySteps.slice(lastVisibleIndex + 1).find((step) => {
+      if (step.tool === 'remove_from_cart') return false;
+      return activityState.get(step.tool) === 'idle';
+    });
+    if (nextStep) visibleSteps.push(nextStep);
+  }
+
+  visibleSteps = visibleSteps.slice(-5);
+
+  activityList.innerHTML = visibleSteps.map((step) => {
+    const status = activityState.get(step.tool) || 'idle';
+    return `<li class="${status}" data-tool-step="${step.tool}">${escapeHtml(step.label)}</li>`;
+  }).join('');
+
+  if (!activitySummary) return;
+  const activeStep = activitySteps.find((step) => activityState.get(step.tool) === 'active');
+  if (activeStep) {
+    activitySummary.textContent = activeStep.label;
+    return;
+  }
+
+  const doneCount = activitySteps.filter((step) => activityState.get(step.tool) === 'done').length;
+  activitySummary.textContent = doneCount ? `${doneCount} steps completed` : 'Waiting for your request';
+}
+
+function resetActivity() {
+  activitySteps.forEach((step) => activityState.set(step.tool, 'idle'));
+  renderActivity();
+}
+
+function setToolActivity(toolName, status) {
+  if (!activityState.has(toolName)) return;
+  activityState.set(toolName, status);
+  renderActivity();
 }
 
 document.addEventListener('click', (event) => {
   const voiceButton = event.target.closest('[data-start-voice]');
   if (voiceButton) {
-    startVoiceSession();
+    toggleVoiceSession();
     return;
   }
 
   const addBundleButton = event.target.closest('[data-add-last-bundle]');
   if (addBundleButton) {
     addLastBundleToCart();
+    return;
+  }
+
+  const removeCartButton = event.target.closest('[data-remove-cart-item]');
+  if (removeCartButton) {
+    removeCartItem(removeCartButton.dataset.removeCartItem);
+    return;
+  }
+
+  const clearCartTarget = event.target.closest('[data-clear-cart]');
+  if (clearCartTarget) {
+    clearCart();
+    return;
+  }
+
+  const openCheckoutTarget = event.target.closest('[data-open-checkout]');
+  if (openCheckoutTarget) {
+    openCheckout();
     return;
   }
 
@@ -104,6 +297,7 @@ async function bootstrap() {
     const data = await getJson('/api/bootstrap?userId=u_001');
     products = data.featuredProducts.slice(0, 3);
     cartLines = data.cart.cart;
+    cartCheckout = data.cart.checkout;
     renderProducts();
     postNative('web_ready');
   } catch (error) {
@@ -111,34 +305,69 @@ async function bootstrap() {
     setVoiceStatus('Start the local server to enable voice.');
     products = fallbackProducts();
     cartLines = products.map((product) => ({ product, quantity: 1, lineTotal: product.price }));
+    cartCheckout = null;
     renderProducts();
   }
 }
 
-async function startVoiceSession() {
+function toggleVoiceSession() {
+  if (realtime?.peerConnection || voiceSessionStarting) {
+    stopVoiceSession();
+    return;
+  }
+
+  startVoiceSession();
+}
+
+async function startVoiceSession({ navigate = true } = {}) {
+  if (voiceSessionStarting) {
+    setVoiceStatus('Voice is connecting...');
+    return;
+  }
+
   if (realtime?.peerConnection) {
     setVoiceStatus('Voice is already connected.');
     return;
   }
 
+  voiceSessionStarting = true;
+  const startToken = ++voiceStartToken;
+  handledRealtimeCalls.clear();
+  resetActivity();
+  voiceAgentScreen?.classList.add('is-listening');
+  let peerConnection = null;
+  let dataChannel = null;
+  let mediaStream = null;
+
   try {
     setVoiceStatus('Connecting...');
-    go('listening');
+    if (navigate) go('listening', { autoStartVoice: false });
 
-    const peerConnection = new RTCPeerConnection();
+    peerConnection = new RTCPeerConnection();
     const audio = document.createElement('audio');
     audio.autoplay = true;
     peerConnection.ontrack = (event) => {
       audio.srcObject = event.streams[0];
     };
 
-    const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      }
+    });
+    if (startToken !== voiceStartToken) {
+      closeVoiceResources({ peerConnection, dataChannel, mediaStream });
+      return;
+    }
+
     peerConnection.addTrack(mediaStream.getAudioTracks()[0], mediaStream);
 
-    const dataChannel = peerConnection.createDataChannel('oai-events');
+    dataChannel = peerConnection.createDataChannel('oai-events');
     dataChannel.addEventListener('open', () => {
       setVoiceStatus('Connected. Tell me what you need.');
-      sendTextPrompt('Greet the user briefly and ask what they need help shopping for.');
+      sendTextPrompt('Greet the user briefly and ask what they need help shopping for.', dataChannel);
     });
     dataChannel.addEventListener('message', handleRealtimeMessage);
 
@@ -146,6 +375,10 @@ async function startVoiceSession() {
     await peerConnection.setLocalDescription(offer);
 
     await verifyServerReachable();
+    if (startToken !== voiceStartToken) {
+      closeVoiceResources({ peerConnection, dataChannel, mediaStream });
+      return;
+    }
 
     const sdpResponse = await fetch(apiUrl('/session'), {
       method: 'POST',
@@ -157,21 +390,60 @@ async function startVoiceSession() {
       throw new Error(await sdpResponse.text());
     }
 
+    if (startToken !== voiceStartToken) {
+      closeVoiceResources({ peerConnection, dataChannel, mediaStream });
+      return;
+    }
+
     await peerConnection.setRemoteDescription({
       type: 'answer',
       sdp: await sdpResponse.text()
     });
 
+    if (startToken !== voiceStartToken) {
+      closeVoiceResources({ peerConnection, dataChannel, mediaStream });
+      return;
+    }
+
     realtime = { peerConnection, dataChannel, mediaStream };
   } catch (error) {
     console.error(error);
+    closeVoiceResources({ peerConnection, dataChannel, mediaStream });
+    voiceAgentScreen?.classList.remove('is-listening');
     setVoiceStatus(`Voice setup failed: ${voiceErrorMessage(error)}`);
+  } finally {
+    if (startToken === voiceStartToken) {
+      voiceSessionStarting = false;
+    }
   }
 }
 
-function sendTextPrompt(text) {
-  if (!realtime?.dataChannel || realtime.dataChannel.readyState !== 'open') return;
-  realtime.dataChannel.send(JSON.stringify({
+function stopVoiceSession() {
+  if (!realtime && !voiceSessionStarting) return;
+  voiceStartToken += 1;
+
+  try {
+    closeVoiceResources(realtime);
+  } finally {
+    realtime = null;
+    voiceSessionStarting = false;
+    voiceAgentScreen?.classList.remove('is-listening', 'is-speaking');
+    setVoiceStatus('Tap the mic to start listening');
+  }
+}
+
+function closeVoiceResources(session) {
+  session?.dataChannel?.close();
+  session?.peerConnection?.getSenders().forEach((sender) => {
+    sender.track?.stop();
+  });
+  session?.mediaStream?.getTracks().forEach((track) => track.stop());
+  session?.peerConnection?.close();
+}
+
+function sendTextPrompt(text, channel = realtime?.dataChannel) {
+  if (!channel || channel.readyState !== 'open') return;
+  channel.send(JSON.stringify({
     type: 'conversation.item.create',
     item: {
       type: 'message',
@@ -179,7 +451,7 @@ function sendTextPrompt(text) {
       content: [{ type: 'input_text', text }]
     }
   }));
-  realtime.dataChannel.send(JSON.stringify({ type: 'response.create' }));
+  channel.send(JSON.stringify({ type: 'response.create' }));
 }
 
 async function handleRealtimeMessage(event) {
@@ -213,6 +485,7 @@ async function runRealtimeTool(functionCall) {
 
   const args = parseArguments(functionCall.arguments);
   if (!args.userId) args.userId = 'u_001';
+  setToolActivity(functionCall.name, 'active');
   setVoiceStatus(`Running ${functionCall.name.replaceAll('_', ' ')}...`);
 
   const response = await postJson('/api/realtime-tool', {
@@ -220,7 +493,8 @@ async function runRealtimeTool(functionCall) {
     arguments: args
   });
 
-  applyToolResult(functionCall.name, response.result);
+  setToolActivity(functionCall.name, 'done');
+  await applyToolResult(functionCall.name, response.result);
 
   realtime.dataChannel.send(JSON.stringify({
     type: 'conversation.item.create',
@@ -233,7 +507,7 @@ async function runRealtimeTool(functionCall) {
   realtime.dataChannel.send(JSON.stringify({ type: 'response.create' }));
 }
 
-function applyToolResult(name, result) {
+async function applyToolResult(name, result) {
   if (name === 'search_catalog') {
     products = (result.results || []).map((entry) => entry.product);
     if (products.length) go('suggestions');
@@ -251,13 +525,15 @@ function applyToolResult(name, result) {
     go('suggestions');
   }
 
-  if (name === 'add_to_cart') {
+  if (name === 'add_to_cart' || name === 'remove_from_cart') {
     cartLines = result.cart || [];
+    await refreshCartPreview();
     go('cart');
   }
 
   if (name === 'checkout_preview') {
     cartLines = result.cart || [];
+    cartCheckout = result;
     go('checkout');
   }
 
@@ -274,8 +550,45 @@ async function addLastBundleToCart() {
   });
   cartLines = result.cart || [];
   renderProducts();
-  await postJson('/api/tools/apply-best-voucher', { userId: 'u_001' });
+  cartCheckout = (await postJson('/api/tools/checkout-preview', { userId: 'u_001' }));
+  renderProducts();
   go('cart');
+}
+
+async function refreshCartPreview() {
+  try {
+    cartCheckout = await postJson('/api/tools/checkout-preview', { userId: 'u_001' });
+  } catch (error) {
+    console.error(error);
+    cartCheckout = null;
+  }
+  renderCartSummary();
+  renderCheckoutSummary();
+}
+
+async function openCheckout() {
+  await refreshCartPreview();
+  cartLines = cartCheckout?.cart || cartLines;
+  renderProducts();
+  go('checkout');
+}
+
+async function removeCartItem(productId) {
+  if (!productId) return;
+  const result = await postJson('/api/tools/remove-from-cart', {
+    userId: 'u_001',
+    productId
+  });
+  cartLines = result.cart || [];
+  cartCheckout = await postJson('/api/tools/checkout-preview', { userId: 'u_001' });
+  renderProducts();
+}
+
+async function clearCart() {
+  const result = await postJson('/api/cart/reset', { userId: 'u_001' });
+  cartLines = result.cart || [];
+  cartCheckout = result.checkout || null;
+  renderProducts();
 }
 
 function parseArguments(raw) {
@@ -347,3 +660,4 @@ function fallbackProducts() {
 }
 
 bootstrap();
+renderActivity();

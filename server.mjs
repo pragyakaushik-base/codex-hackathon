@@ -14,6 +14,7 @@ import {
   getCart,
   getToolDefinitions,
   recommendBundle,
+  removeFromCart,
   resetCart,
   searchCatalog
 } from "./commerce.mjs";
@@ -31,6 +32,7 @@ const TOOL_ROUTES = {
   "/api/tools/recommend-bundle": recommendBundle,
   "/api/tools/compare-products": compareProducts,
   "/api/tools/add-to-cart": addToCart,
+  "/api/tools/remove-from-cart": removeFromCart,
   "/api/tools/apply-best-voucher": applyBestVoucher,
   "/api/tools/checkout-preview": checkoutPreview
 };
@@ -178,6 +180,16 @@ function buildRealtimeSessionConfig() {
     model: process.env.OPENAI_REALTIME_MODEL || "gpt-realtime-2",
     instructions: REALTIME_INSTRUCTIONS,
     audio: {
+      input: {
+        turn_detection: {
+          type: "server_vad",
+          threshold: Number(process.env.OPENAI_REALTIME_VAD_THRESHOLD || 0.68),
+          prefix_padding_ms: Number(process.env.OPENAI_REALTIME_VAD_PREFIX_PADDING_MS || 500),
+          silence_duration_ms: Number(process.env.OPENAI_REALTIME_VAD_SILENCE_MS || 900),
+          create_response: true,
+          interrupt_response: true
+        }
+      },
       output: {
         voice: process.env.OPENAI_REALTIME_VOICE || "marin"
       }
@@ -198,14 +210,14 @@ Tool strategy:
 3. Explain recommendations using factual product fields such as bestFor, tradeoffs, rating, delivery, seller, and stock.
 4. Suggest compatible bundles when the user is solving a practical task.
 5. Compare products when multiple options are plausible.
-6. Never add items to cart without explicit user confirmation.
+6. Never add items to or remove items from cart without explicit user confirmation.
 7. After cart mutation, apply the best voucher and call checkout_preview.
 
 Keep spoken replies concise and demo-friendly. Ask one clear follow-up only when required.
 `.trim();
 
 async function serveStatic(pathname, res) {
-  const cleanPath = pathname === "/" ? "/index.html" : decodeURIComponent(pathname);
+  const cleanPath = pathname === "/" ? "index.html" : decodeURIComponent(pathname).replace(/^\/+/, "");
   const target = path.normalize(path.join(webRoot, cleanPath));
   if (!target.startsWith(webRoot)) {
     sendJson(res, { error: "Forbidden" }, 403);

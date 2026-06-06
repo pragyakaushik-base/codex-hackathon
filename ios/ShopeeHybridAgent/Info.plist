@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>AgentBaseURL</key>
-	<string>http://10.22.64.15:3000</string>
+  <string>https://fb6d-118-201-124-124.ngrok-free.app</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

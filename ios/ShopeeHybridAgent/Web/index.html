@@ -55,6 +55,13 @@
           <p data-voice-status>You can speak now</p>
         </div>
       </div>
+      <section class="agent-activity" aria-label="Agent activity">
+        <header>
+          <strong>Analyzing</strong>
+          <span data-agent-activity-summary>Waiting for your request</span>
+        </header>
+        <ol data-agent-activity></ol>
+      </section>
       <nav class="bottom-actions shopee-actions">
         <button class="round-action icon-close" type="button" data-go="home" aria-label="Close"></button>
         <button class="primary-mic icon-mic" type="button" data-start-voice aria-label="Start voice agent"></button>
@@ -103,6 +110,11 @@
     </section>
 
     <section class="screen agent-screen suggestions-screen" data-screen="suggestions" aria-label="Suggestions">
+      <header class="suggestions-top">
+        <button class="icon-button" type="button" data-go="listening" aria-label="Back to voice agent">‹</button>
+        <strong>Recommendations</strong>
+        <span></span>
+      </header>
       <div class="chat-bubble">I found the best matches for your leak. Here are the top options.</div>
       <div class="chips" aria-label="Filters">
         <span>Best Match</span>
@@ -118,46 +130,46 @@
     </section>
 
     <section class="screen agent-screen cart-screen" data-screen="cart" aria-label="Cart">
-      <div class="chat-bubble">Great I've added them to your cart and applied a free shipping voucher.</div>
+      <div class="chat-bubble" data-cart-message>Your cart is empty.</div>
       <header class="section-header">
-        <strong>Cart (3 items)</strong>
-        <button type="button">Edit</button>
+        <strong data-cart-title>Cart (0 items)</strong>
+        <button type="button" data-clear-cart>Clear</button>
       </header>
       <div class="cart-list"></div>
-      <div class="voucher-card">
-        <span>Voucher Applied</span>
-        <strong>FREE SHIPPING</strong>
-        <em>Saved $2.99</em>
+      <div class="voucher-card" data-voucher-card>
+        <span data-voucher-label>Voucher</span>
+        <strong data-voucher-code>No eligible voucher</strong>
+        <em data-voucher-saving>Keep shopping to unlock savings</em>
       </div>
-      <button class="primary-button full" type="button" data-go="checkout">View Checkout</button>
+      <button class="primary-button full" type="button" data-open-checkout>View Checkout</button>
     </section>
 
     <section class="screen agent-screen checkout-screen" data-screen="checkout" aria-label="Checkout preview">
-      <div class="chat-bubble">Here's your order summary. Shall we proceed to checkout?</div>
+      <div class="chat-bubble" data-checkout-message>Here's your order summary. Shall we proceed to checkout?</div>
       <section class="summary-card">
         <h2>Order Summary</h2>
         <dl>
           <div>
-            <dt>Subtotal (3 items)</dt>
-            <dd>$12.20</dd>
+            <dt data-checkout-subtotal-label>Subtotal (0 items)</dt>
+            <dd data-checkout-subtotal>$0.00</dd>
           </div>
           <div>
             <dt>Shipping Fee</dt>
-            <dd class="muted"><s>$2.99</s></dd>
+            <dd data-checkout-shipping>$0.00</dd>
           </div>
           <div>
             <dt>Voucher Discount</dt>
-            <dd class="green">-$2.99</dd>
+            <dd class="green" data-checkout-discount>-$0.00</dd>
           </div>
           <div class="total">
             <dt>Total</dt>
-            <dd>$12.20</dd>
+            <dd data-checkout-total>$0.00</dd>
           </div>
         </dl>
       </section>
-      <div class="checkout-row"><span>Estimated Delivery</span><strong>Tomorrow, 10 May</strong></div>
-      <div class="checkout-row"><span>Payment Method</span><strong>ShopeePay</strong></div>
-      <button class="checkout-button" type="button">Proceed to Checkout</button>
+      <div class="checkout-row"><span>Estimated Delivery</span><strong data-checkout-delivery>-</strong></div>
+      <div class="checkout-row"><span>Payment Method</span><strong data-checkout-payment>ShopeePay</strong></div>
+      <button class="checkout-button" type="button" data-proceed-checkout>Proceed to Checkout</button>
       <button class="round-button close-bottom" type="button" data-go="home" aria-label="Close">x</button>
     </section>
   </main>
