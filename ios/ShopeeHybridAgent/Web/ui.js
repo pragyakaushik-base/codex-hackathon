@@ -566,7 +566,9 @@ async function startVoiceSession({ navigate = true } = {}) {
       return;
     }
 
-    peerConnection.addTrack(mediaStream.getAudioTracks()[0], mediaStream);
+    const microphoneTrack = mediaStream.getAudioTracks()[0];
+    monitorMicrophoneTrack(microphoneTrack);
+    peerConnection.addTrack(microphoneTrack, mediaStream);
 
     dataChannel = peerConnection.createDataChannel('oai-events');
     dataChannel.addEventListener('open', () => {
@@ -859,6 +861,49 @@ async function captureCameraFrame() {
   } finally {
     stream?.getTracks().forEach((track) => track.stop());
     if (video) video.srcObject = null;
+    await restoreRealtimeMicrophoneIfNeeded();
+  }
+}
+
+function monitorMicrophoneTrack(track) {
+  if (!track) return;
+  track.addEventListener('ended', () => {
+    console.warn('Realtime microphone track ended.');
+    setVoiceStatus('Microphone paused. Restoring voice...');
+  }, { once: true });
+}
+
+async function restoreRealtimeMicrophoneIfNeeded() {
+  if (!realtime?.peerConnection || realtime.peerConnection.connectionState === 'closed') return;
+
+  const sender = realtime.peerConnection.getSenders().find((candidate) => candidate.track?.kind === 'audio');
+  const currentTrack = sender?.track || realtime.mediaStream?.getAudioTracks()[0];
+  if (currentTrack?.readyState === 'live') return;
+
+  try {
+    const replacementStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      }
+    });
+    const replacementTrack = replacementStream.getAudioTracks()[0];
+    monitorMicrophoneTrack(replacementTrack);
+
+    if (sender) {
+      await sender.replaceTrack(replacementTrack);
+    } else {
+      realtime.peerConnection.addTrack(replacementTrack, replacementStream);
+    }
+
+    realtime.mediaStream?.getTracks().forEach((track) => track.stop());
+    realtime.mediaStream = replacementStream;
+    voiceAgentScreen?.classList.add('is-listening');
+    setVoiceStatus('Microphone restored. Listening for the next step.');
+  } catch (error) {
+    console.error('Failed to restore microphone', error);
+    setVoiceStatus(`Microphone paused: ${voiceErrorMessage(error)}`);
   }
 }
 
