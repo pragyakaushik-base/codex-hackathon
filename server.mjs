@@ -10,6 +10,7 @@ import {
   checkoutPreview,
   checkUserHistory,
   classifyNeed,
+  buildSpatialSetup,
   compareProducts,
   dispatchTool,
   getBootstrap,
@@ -26,6 +27,7 @@ loadEnv(path.join(__dirname, ".env"));
 
 const host = process.env.HOST || "0.0.0.0";
 const port = Number(process.env.PORT || 3000);
+const publicBaseUrl = normalizeBaseUrl(process.env.PUBLIC_BASE_URL || process.env.AGENT_BASE_URL);
 const webRoot = path.join(__dirname, "ios", "ShopeeHybridAgent", "Web");
 
 const TOOL_ROUTES = {
@@ -33,6 +35,7 @@ const TOOL_ROUTES = {
   "/api/tools/analyze-surroundings": analyzeSurroundingsWithVision,
   "/api/tools/classify-need": classifyNeed,
   "/api/tools/search-catalog": searchCatalog,
+  "/api/tools/build-spatial-setup": buildSpatialSetup,
   "/api/tools/recommend-bundle": recommendBundle,
   "/api/tools/compare-products": compareProducts,
   "/api/tools/add-to-cart": addToCart,
@@ -106,6 +109,9 @@ server.listen(port, host, () => {
   for (const address of getLanAddresses()) {
     console.log(`iPhone LAN URL: http://${address}:${port}`);
   }
+  if (publicBaseUrl) {
+    console.log(`Public URL: ${publicBaseUrl}`);
+  }
 });
 
 function loadEnv(filePath) {
@@ -133,6 +139,12 @@ function getLanAddresses() {
     }
   }
   return addresses;
+}
+
+function normalizeBaseUrl(value) {
+  const trimmed = value?.trim();
+  if (!trimmed) return "";
+  return trimmed.endsWith("/") ? trimmed.slice(0, -1) : trimmed;
 }
 
 async function readTextBody(req) {
@@ -179,10 +191,16 @@ async function createRealtimeSession(req, res) {
 }
 
 async function dispatchRealtimeTool(name, args) {
-  if (name === "analyze_surroundings") {
+  const toolName = normalizeRealtimeToolName(name);
+  if (toolName === "analyze_surroundings") {
     return analyzeSurroundingsWithVision(args);
   }
-  return dispatchTool(name, args);
+  return dispatchTool(toolName, args);
+}
+
+function normalizeRealtimeToolName(name = "") {
+  if (name === "analyse_surroundings") return "analyze_surroundings";
+  return name;
 }
 
 async function analyzeSurroundingsWithVision(args = {}) {
@@ -414,12 +432,15 @@ Tool strategy:
 1. Classify the user's need before searching the catalog.
 2. Check user history early when the request may involve replenishment, prior preferences, duplicate avoidance, or context such as home setup.
 3. If the user refers to what they are seeing, holding, pointing at, wearing, or photographing, call analyze_surroundings before classification or catalog search.
-4. Search only the catalog tool for recommendations.
-5. Explain recommendations using factual product fields such as bestFor, tradeoffs, rating, delivery, seller, and stock.
-6. Suggest compatible bundles when the user is solving a practical task.
-7. Compare products when multiple options are plausible.
-8. Never add items to or remove items from cart without explicit user confirmation.
-9. After cart mutation, apply the best voucher and call checkout_preview.
+4. For visual questions like "what am I looking at?", "what do you see?", "analyze my surroundings", or "what is this?", you must call analyze_surroundings first. Do not say you cannot access the camera if that tool is available.
+5. Search only the catalog tool for recommendations.
+6. When the user wants to build, place, preview, or remix a desk setup in AR or 3D, call build_spatial_setup.
+7. Treat short follow-up edits like "remove the lamp", "make it more aesthetic", "make it cheaper", or "keep the monitor but change the accessories" as build_spatial_setup requests when a setup already exists.
+8. Explain recommendations using factual product fields such as bestFor, tradeoffs, rating, delivery, seller, stock, fit score, and total price.
+9. Suggest compatible bundles when the user is solving a practical task.
+10. Compare products when multiple options are plausible.
+11. Never add items to or remove items from cart without explicit user confirmation.
+12. After cart mutation, apply the best voucher and call checkout_preview.
 
 Keep spoken replies concise and demo-friendly. Ask one clear follow-up only when required.
 `.trim();

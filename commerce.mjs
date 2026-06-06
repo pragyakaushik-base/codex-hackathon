@@ -58,6 +58,10 @@ function roundMoney(value) {
   return Math.round((value + Number.EPSILON) * 100) / 100;
 }
 
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
 function normalize(text = "") {
   return String(text).toLowerCase();
 }
@@ -71,7 +75,7 @@ function tokenize(text = "") {
 
 function getSession(userId = "u_001") {
   if (!sessions.has(userId)) {
-    sessions.set(userId, { cart: [] });
+    sessions.set(userId, { cart: [], lastSetup: null });
   }
   return sessions.get(userId);
 }
@@ -121,9 +125,208 @@ function inferConstraints(message = "") {
   };
 }
 
+function parseBudgetValue(message = "", fallback = 800) {
+  const match = String(message).match(/\$?(\d+(?:\.\d+)?)/);
+  return match ? Number(match[1]) : fallback;
+}
+
+function getSetupRole(product) {
+  return product?.attributes?.setupRole || null;
+}
+
+function roleProducts(role) {
+  return products.filter((product) => getSetupRole(product) === role && product.stock > 0);
+}
+
+function styleTags(product) {
+  return product?.attributes?.style || [];
+}
+
+function layoutPositionForRole(role) {
+  switch (role) {
+    case "monitor":
+      return "center_back";
+    case "lamp":
+      return "left_back";
+    case "laptop_stand":
+      return "right_back";
+    case "keyboard":
+      return "front_center";
+    case "mouse":
+      return "front_right";
+    case "plant":
+      return "front_left";
+    default:
+      return "front_center";
+  }
+}
+
+function reasonForRole(role, message, product, deskWidthCm, deskDepthCm) {
+  const text = normalize(message);
+  switch (role) {
+    case "monitor":
+      if (text.includes("smaller")) return `${product.title} keeps the setup compact for a shallower desk while preserving coding space.`;
+      return `I placed ${product.title} in the center for focus and comfortable split-screen work.`;
+    case "lamp":
+      return `I placed ${product.title} on the left to reduce glare while keeping the keyboard area clear.`;
+    case "laptop_stand":
+      return `I placed ${product.title} on the right because there is more free space there on a ${deskWidthCm} by ${deskDepthCm} cm desk.`;
+    case "keyboard":
+      return `${product.title} stays front and center so the main typing zone remains clear and comfortable.`;
+    case "mouse":
+      return `${product.title} sits on the front right to preserve a natural mouse arc beside the keyboard.`;
+    case "plant":
+      return `${product.title} adds warmth without taking over the main work area.`;
+    default:
+      return product.description || `Placed ${product.title} where it fits best.`;
+  }
+}
+
+function buildSetupSummary(name, totalPrice, budget, fitScore, items) {
+  const roles = items.map((item) => getSetupRole(item.product)).filter(Boolean);
+  const monitor = roles.includes("monitor") ? "monitor" : "display";
+  const lamp = roles.includes("lamp") ? "lamp" : "lighting";
+  const stand = roles.includes("laptop_stand") ? "laptop stand" : "accessory";
+  return `${name} fits the desk with a ${monitor} centered, the ${lamp} offset to control glare, and the ${stand} on the right. Total: $${totalPrice}. Fit score: ${fitScore}/100. Budget used: $${totalPrice} of $${budget}.`;
+}
+
+function scoreSetupCandidate(product, mode, text) {
+  const styles = styleTags(product);
+  let score = product.rating * 12 - product.price / 12;
+  if (mode === "budget") score += 30 - product.price / 8;
+  if (mode === "aesthetic") score += styles.includes("aesthetic") || styles.includes("minimal") || styles.includes("warm") ? 20 : 0;
+  if (mode === "premium") score += styles.includes("premium") ? 16 : 0;
+  if (mode === "productivity") score += styles.includes("productivity") || styles.includes("student") ? 16 : 0;
+  if (text.includes("student") && styles.includes("student")) score += 8;
+  if (text.includes("minimal") && styles.includes("minimal")) score += 8;
+  if (text.includes("aesthetic") && styles.includes("aesthetic")) score += 8;
+  if (text.includes("smaller monitor") && product.title.includes("24")) score += 18;
+  if (text.includes("gaming")) score += product.title.includes("27") ? 6 : 0;
+  return score;
+}
+
+function chooseSetupProduct(role, { mode, message, previousSetup, keepMonitor, swapAccessories }) {
+  const text = normalize(message);
+  const candidates = roleProducts(role);
+  if (!candidates.length) return null;
+
+  if (role === "monitor" && keepMonitor && previousSetup?.items?.length) {
+    const previousMonitor = previousSetup.items.find((item) => getSetupRole(item.product) === "monitor");
+    if (previousMonitor) return previousMonitor.product;
+  }
+
+  let pool = [...candidates];
+  if (role === "monitor" && text.includes("smaller monitor")) {
+    pool = pool.filter((product) => product.title.includes("24")) || pool;
+  }
+
+  pool.sort((a, b) => scoreSetupCandidate(b, mode, text) - scoreSetupCandidate(a, mode, text));
+
+  if (swapAccessories && role !== "monitor" && previousSetup?.items?.length) {
+    const previousIds = new Set(previousSetup.items.map((item) => item.product.id));
+    const alternate = pool.find((product) => !previousIds.has(product.id));
+    if (alternate) return alternate;
+  }
+
+  return pool[0];
+}
+
+function optimizeSetupForBudget(selectedItems, budget) {
+  const items = [...selectedItems];
+  let total = roundMoney(items.reduce((sum, item) => sum + item.product.price, 0));
+  if (total <= budget) return items;
+
+  const plantIndex = items.findIndex((item) => getSetupRole(item.product) === "plant");
+  if (plantIndex !== -1) {
+    items.splice(plantIndex, 1);
+    total = roundMoney(items.reduce((sum, item) => sum + item.product.price, 0));
+  }
+  if (total <= budget) return items;
+
+  const cheaperMonitor = roleProducts("monitor").sort((a, b) => a.price - b.price)[0];
+  const monitorIndex = items.findIndex((item) => getSetupRole(item.product) === "monitor");
+  if (monitorIndex !== -1 && cheaperMonitor && cheaperMonitor.price < items[monitorIndex].product.price) {
+    items[monitorIndex] = { ...items[monitorIndex], product: cheaperMonitor };
+    total = roundMoney(items.reduce((sum, item) => sum + item.product.price, 0));
+  }
+  if (total <= budget) return items;
+
+  const cheaperKeyboard = roleProducts("keyboard").sort((a, b) => a.price - b.price)[0];
+  const keyboardIndex = items.findIndex((item) => getSetupRole(item.product) === "keyboard");
+  if (keyboardIndex !== -1 && cheaperKeyboard && cheaperKeyboard.price < items[keyboardIndex].product.price) {
+    items[keyboardIndex] = { ...items[keyboardIndex], product: cheaperKeyboard };
+  }
+
+  return items;
+}
+
+export function buildSpatialSetup({ message = "", userId = "u_001", deskWidthCm = 100, deskDepthCm = 60 } = {}) {
+  const session = getSession(userId);
+  const previousSetup = session.lastSetup;
+  const text = normalize(message);
+  const budget = parseBudgetValue(message, previousSetup?.budget || 800);
+
+  const wantsAesthetic = ["aesthetic", "minimal", "warmer", "warm"].some((term) => text.includes(term));
+  const wantsCheaper = ["cheaper", "budget", "affordable"].some((term) => text.includes(term));
+  const wantsPremium = ["premium", "better", "upgrade"].some((term) => text.includes(term));
+  const wantsGaming = text.includes("gaming");
+  const removeLamp = text.includes("remove the lamp") || text.includes("without lamp");
+  const keepMonitor = text.includes("keep the monitor");
+  const swapAccessories = text.includes("change the accessories");
+
+  const mode = wantsAesthetic ? "aesthetic" : wantsCheaper ? "budget" : wantsPremium || wantsGaming ? "premium" : "productivity";
+
+  const requiredRoles = ["monitor", "keyboard", "mouse", "laptop_stand"];
+  if (!removeLamp) requiredRoles.splice(1, 0, "lamp");
+  if (mode === "aesthetic") requiredRoles.push("plant");
+
+  let items = requiredRoles.map((role) => {
+    const product = chooseSetupProduct(role, { mode, message, previousSetup, keepMonitor, swapAccessories });
+    return product ? { role, product } : null;
+  }).filter(Boolean);
+
+  items = optimizeSetupForBudget(items, budget);
+
+  const totalPrice = roundMoney(items.reduce((sum, item) => sum + item.product.price, 0));
+  const budgetPenalty = totalPrice > budget ? Math.round((totalPrice - budget) / 8) : 0;
+  const depthPenalty = deskDepthCm < 55 && items.some((item) => getSetupRole(item.product) === "monitor" && item.product.title.includes("27")) ? 6 : 0;
+  const fitScore = clamp(92 - budgetPenalty - depthPenalty + (mode === "aesthetic" ? 2 : 0), 70, 97);
+
+  const setupName = mode === "aesthetic"
+    ? "Aesthetic Focus Setup"
+    : mode === "budget"
+      ? "Budget Coding Setup"
+      : mode === "premium"
+        ? "Premium Productivity Setup"
+        : "Productive Student Setup";
+
+  const result = {
+    setup_name: setupName,
+    total_price: totalPrice,
+    fit_score: fitScore,
+    budget,
+    summary: buildSetupSummary(setupName, totalPrice, budget, fitScore, items),
+    items: items.map(({ role, product }) => ({
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      position: layoutPositionForRole(role),
+      reason: reasonForRole(role, message, product, deskWidthCm, deskDepthCm),
+      product: enrichProduct(product)
+    }))
+  };
+
+  session.lastSetup = result;
+  return result;
+}
+
 export function classifyNeed({ message = "", imageContext = null } = {}) {
   const category = inferCategory(`${message} ${imageContext?.summary || ""}`);
   const constraints = inferConstraints(message);
+  const normalizedMessage = normalize(message);
+  const hasExistingSetup = Boolean(getSession("u_001").lastSetup);
+  const setupRequest = /setup|workspace|desk|coding station|student setup|3d|ar/.test(normalizedMessage)
+    || (hasExistingSetup && /remove|swap|change|replace|more aesthetic|more premium|cheaper|smaller monitor|keep the monitor|accessories|lamp|mouse|keyboard|stand|plant/.test(normalizedMessage));
   const searchTerms = [
     ...tokenize(message),
     ...CATEGORY_HINTS.find((hint) => hint.category === category)?.terms.slice(0, 4) || []
@@ -135,7 +338,7 @@ export function classifyNeed({ message = "", imageContext = null } = {}) {
     problemSummary: message || imageContext?.summary || "User needs shopping help.",
     constraints,
     searchTerms: [...new Set(searchTerms)].slice(0, 10),
-    nextBestTool: "search_catalog"
+    nextBestTool: setupRequest ? "build_spatial_setup" : "search_catalog"
   };
 }
 
@@ -666,6 +869,8 @@ export function dispatchTool(name, args = {}) {
       return classifyNeed(args);
     case "search_catalog":
       return searchCatalog(args);
+    case "build_spatial_setup":
+      return buildSpatialSetup(args);
     case "recommend_bundle":
       return recommendBundle(args);
     case "compare_products":
@@ -700,7 +905,7 @@ export function getToolDefinitions() {
     {
       type: "function",
       name: "analyze_surroundings",
-      description: "Analyze the user's camera snapshot or visual context and return structured shopping clues before catalog search.",
+      description: "Analyze the user's current camera view or surroundings. The client captures and passes an image automatically, so use this for prompts like 'what am I looking at?' or 'analyze my surroundings' before catalog search.",
       parameters: {
         type: "object",
         properties: {
@@ -739,6 +944,21 @@ export function getToolDefinitions() {
           limit: { type: "number" }
         },
         required: ["query"]
+      }
+    },
+    {
+      type: "function",
+      name: "build_spatial_setup",
+      description: "Build and remix a full desk setup for AR/3D viewing using budget, style, and desk-space cues. Use this when the user wants to see a setup placed in their real space.",
+      parameters: {
+        type: "object",
+        properties: {
+          message: { type: "string", description: "The user's setup goal or remix request, for example 'Build me a productive student setup under $800' or 'Make it more aesthetic'." },
+          userId: { type: "string" },
+          deskWidthCm: { type: "number", description: "Approximate desk width in centimeters. Use 100 if unknown." },
+          deskDepthCm: { type: "number", description: "Approximate desk depth in centimeters. Use 60 if unknown." }
+        },
+        required: ["message"]
       }
     },
     {

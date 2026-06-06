@@ -1,0 +1,98 @@
+{
+  "FILM-001": {
+    "modelName": "DslrCamera",
+    "accentHex": "#F36F28",
+    "arLabel": "DSLR Creator Kit",
+    "scale": 1
+  },
+  "FILM-002": {
+    "modelName": "DslrCamera",
+    "accentHex": "#4285F4",
+    "arLabel": "Mirrorless Video Bundle",
+    "scale": 1
+  },
+  "FILM-003": {
+    "modelName": "DslrCamera",
+    "accentHex": "#34A853",
+    "arLabel": "Vlogging Camera Set",
+    "scale": 1
+  },
+  "FILM-004": {
+    "modelName": "DslrCamera",
+    "accentHex": "#A142F4",
+    "arLabel": "Cinema Starter Rig",
+    "scale": 1
+  },
+  "SETMON24": {
+    "modelName": "Monitor",
+    "accentHex": "#4B89DC",
+    "arLabel": "24-inch Monitor",
+    "scale": 1
+  },
+  "SETMON27": {
+    "modelName": "Monitor",
+    "accentHex": "#2F80ED",
+    "arLabel": "27-inch Monitor",
+    "scale": 1
+  },
+  "SETMON27A": {
+    "modelName": "Monitor",
+    "accentHex": "#6C8EAD",
+    "arLabel": "Minimal Monitor",
+    "scale": 1
+  },
+  "SETKEYBUD": {
+    "modelName": "Keyboard",
+    "accentHex": "#F2994A",
+    "arLabel": "Coding Keyboard",
+    "scale": 1
+  },
+  "SETKEYMIN": {
+    "modelName": "Keyboard",
+    "accentHex": "#DFAF5D",
+    "arLabel": "Wireless Keyboard",
+    "scale": 1
+  },
+  "SETMOUSEERG": {
+    "modelName": "Mouse",
+    "accentHex": "#27AE60",
+    "arLabel": "Ergo Mouse",
+    "scale": 1
+  },
+  "SETMOUSEMIN": {
+    "modelName": "Mouse",
+    "accentHex": "#8BC6A2",
+    "arLabel": "Minimal Mouse",
+    "scale": 1
+  },
+  "SETLAMPMIN": {
+    "modelName": "DeskLamp",
+    "accentHex": "#F2C94C",
+    "arLabel": "Desk Lamp",
+    "scale": 1
+  },
+  "SETLAMPWARM": {
+    "modelName": "DeskLamp",
+    "accentHex": "#E2B66B",
+    "arLabel": "Warm Lamp",
+    "scale": 1
+  },
+  "SETSTANDALU": {
+    "modelName": "LaptopStand",
+    "accentHex": "#9BA7B4",
+    "arLabel": "Laptop Stand",
+    "scale": 1
+  },
+  "SETSTANDWOOD": {
+    "modelName": "LaptopStand",
+    "accentHex": "#8D6E63",
+    "arLabel": "Laptop Riser",
+    "scale": 1
+  },
+  "SETPLANT": {
+    "modelName": "PottedPlant",
+    "accentHex": "#5E9C76",
+    "arLabel": "Plant Accent",
+    "scale": 1
+  }
+}

@@ -919,5 +919,305 @@
       "worksWith": ["EL005", "EL006", "EL007", "HD006"]
     },
     "bundleItems": ["EL006", "EL007"]
+  },
+  {
+    "id": "SETMON24",
+    "title": "FocusView 24-inch Student Monitor",
+    "category": "electronics",
+    "description": "Compact 24-inch monitor for smaller study desks and budget coding setups.",
+    "keywords": ["monitor", "coding", "student", "desk setup", "24 inch", "productivity"],
+    "price": 219,
+    "rating": 4.6,
+    "reviewCount": 244,
+    "sellerId": "S004",
+    "delivery": "next_day",
+    "stock": 18,
+    "attributes": {
+      "setupRole": "monitor",
+      "widthCm": 54,
+      "depthCm": 12,
+      "style": ["student", "budget", "compact"]
+    },
+    "bestFor": ["Smaller study desks", "Budget coding setups"],
+    "tradeoffs": ["Less screen space than 27-inch options", "Basic stand"],
+    "compatibility": {
+      "worksWith": ["SETKEYBUD", "SETMOUSEMIN", "SETLAMPMIN", "SETSTANDALU"]
+    },
+    "bundleItems": ["SETKEYBUD", "SETMOUSEMIN", "SETLAMPMIN", "SETSTANDALU"]
+  },
+  {
+    "id": "SETMON27",
+    "title": "CodeCanvas 27-inch Monitor",
+    "category": "electronics",
+    "description": "Balanced 27-inch monitor for coding, split-screen work, and productivity.",
+    "keywords": ["monitor", "coding", "desk setup", "27 inch", "productivity", "student"],
+    "price": 299,
+    "rating": 4.8,
+    "reviewCount": 331,
+    "sellerId": "S004",
+    "delivery": "next_day",
+    "stock": 12,
+    "attributes": {
+      "setupRole": "monitor",
+      "widthCm": 61,
+      "depthCm": 14,
+      "style": ["productivity", "student", "balanced"]
+    },
+    "bestFor": ["Coding setups", "Multitasking desks", "Study workstations"],
+    "tradeoffs": ["Needs moderate desk depth", "Stand is functional rather than minimal"],
+    "compatibility": {
+      "worksWith": ["SETKEYBUD", "SETMOUSEERG", "SETLAMPMIN", "SETSTANDALU"]
+    },
+    "bundleItems": ["SETKEYBUD", "SETMOUSEERG", "SETLAMPMIN", "SETSTANDALU"]
+  },
+  {
+    "id": "SETMON27A",
+    "title": "StudioSlim 27-inch Minimal Monitor",
+    "category": "electronics",
+    "description": "Minimal 27-inch monitor with a cleaner stand for a warmer, design-forward desk setup.",
+    "keywords": ["monitor", "minimal", "aesthetic", "27 inch", "desk setup"],
+    "price": 349,
+    "rating": 4.7,
+    "reviewCount": 174,
+    "sellerId": "S004",
+    "delivery": "standard",
+    "stock": 10,
+    "attributes": {
+      "setupRole": "monitor",
+      "widthCm": 61,
+      "depthCm": 13,
+      "style": ["aesthetic", "minimal", "premium"]
+    },
+    "bestFor": ["Minimal setups", "Design-forward desks"],
+    "tradeoffs": ["Costs more", "Slower delivery"],
+    "compatibility": {
+      "worksWith": ["SETKEYMIN", "SETMOUSEMIN", "SETLAMPWARM", "SETSTANDWOOD", "SETPLANT"]
+    },
+    "bundleItems": ["SETKEYMIN", "SETMOUSEMIN", "SETLAMPWARM", "SETSTANDWOOD", "SETPLANT"]
+  },
+  {
+    "id": "SETKEYBUD",
+    "title": "Compact Coding Keyboard",
+    "category": "electronics",
+    "description": "Compact keyboard that preserves desk space while staying comfortable for coding and writing.",
+    "keywords": ["keyboard", "coding", "compact", "desk setup", "student"],
+    "price": 79,
+    "rating": 4.7,
+    "reviewCount": 287,
+    "sellerId": "S004",
+    "delivery": "same_day",
+    "stock": 42,
+    "attributes": {
+      "setupRole": "keyboard",
+      "widthCm": 31,
+      "depthCm": 12,
+      "style": ["productivity", "student", "compact"]
+    },
+    "bestFor": ["Compact coding desks", "Daily typing"],
+    "tradeoffs": ["No numpad", "Less premium finish"],
+    "compatibility": {
+      "worksWith": ["SETMON24", "SETMON27", "SETMOUSEERG", "SETLAMPMIN"]
+    },
+    "bundleItems": ["SETMON27", "SETMOUSEERG"]
+  },
+  {
+    "id": "SETKEYMIN",
+    "title": "Minimal Wireless Keyboard",
+    "category": "electronics",
+    "description": "Low-profile wireless keyboard with a cleaner silhouette for aesthetic desk builds.",
+    "keywords": ["keyboard", "minimal", "wireless", "aesthetic", "desk setup"],
+    "price": 99,
+    "rating": 4.8,
+    "reviewCount": 208,
+    "sellerId": "S004",
+    "delivery": "next_day",
+    "stock": 26,
+    "attributes": {
+      "setupRole": "keyboard",
+      "widthCm": 29,
+      "depthCm": 11,
+      "style": ["aesthetic", "minimal", "premium"]
+    },
+    "bestFor": ["Minimal desks", "Quiet shared spaces"],
+    "tradeoffs": ["Costs more", "Shallower key travel"],
+    "compatibility": {
+      "worksWith": ["SETMON27A", "SETMOUSEMIN", "SETLAMPWARM", "SETSTANDWOOD"]
+    },
+    "bundleItems": ["SETMON27A", "SETMOUSEMIN"]
+  },
+  {
+    "id": "SETMOUSEERG",
+    "title": "Ergo Silent Mouse",
+    "category": "electronics",
+    "description": "Silent ergonomic mouse for longer coding sessions and shared work spaces.",
+    "keywords": ["mouse", "ergonomic", "silent", "coding", "desk setup"],
+    "price": 45,
+    "rating": 4.6,
+    "reviewCount": 233,
+    "sellerId": "S004",
+    "delivery": "same_day",
+    "stock": 57,
+    "attributes": {
+      "setupRole": "mouse",
+      "widthCm": 11,
+      "depthCm": 7,
+      "style": ["productivity", "practical"]
+    },
+    "bestFor": ["Long work sessions", "Quiet clicks"],
+    "tradeoffs": ["Not ultra-minimal", "Basic finish"],
+    "compatibility": {
+      "worksWith": ["SETKEYBUD", "SETMON27"]
+    },
+    "bundleItems": ["SETKEYBUD"]
+  },
+  {
+    "id": "SETMOUSEMIN",
+    "title": "Pebble Minimal Mouse",
+    "category": "electronics",
+    "description": "Small, cleaner mouse for aesthetic desks and lighter everyday work.",
+    "keywords": ["mouse", "minimal", "aesthetic", "desk setup", "compact"],
+    "price": 29,
+    "rating": 4.5,
+    "reviewCount": 184,
+    "sellerId": "S004",
+    "delivery": "next_day",
+    "stock": 65,
+    "attributes": {
+      "setupRole": "mouse",
+      "widthCm": 10,
+      "depthCm": 6,
+      "style": ["aesthetic", "compact", "budget"]
+    },
+    "bestFor": ["Minimal desks", "Tighter budgets"],
+    "tradeoffs": ["Less ergonomic", "Smaller for large hands"],
+    "compatibility": {
+      "worksWith": ["SETKEYMIN", "SETMON24", "SETMON27A"]
+    },
+    "bundleItems": ["SETKEYMIN"]
+  },
+  {
+    "id": "SETLAMPMIN",
+    "title": "Minimal Desk Lamp",
+    "category": "home_decor",
+    "description": "Compact task lamp for reading, note-taking, and evening coding.",
+    "keywords": ["lamp", "desk lamp", "productivity", "study", "desk setup"],
+    "price": 49,
+    "rating": 4.7,
+    "reviewCount": 211,
+    "sellerId": "S006",
+    "delivery": "same_day",
+    "stock": 34,
+    "attributes": {
+      "setupRole": "lamp",
+      "widthCm": 14,
+      "depthCm": 14,
+      "style": ["productivity", "compact", "student"]
+    },
+    "bestFor": ["Night study", "Task lighting"],
+    "tradeoffs": ["Cooler light tone", "Functional look"],
+    "compatibility": {
+      "worksWith": ["SETMON24", "SETMON27", "SETKEYBUD"]
+    },
+    "bundleItems": ["SETMON27"]
+  },
+  {
+    "id": "SETLAMPWARM",
+    "title": "Warm Glow Desk Lamp",
+    "category": "home_decor",
+    "description": "Warmer desk lamp that softens the setup visually and feels more homey on camera.",
+    "keywords": ["lamp", "warm light", "aesthetic", "desk setup", "minimal"],
+    "price": 69,
+    "rating": 4.8,
+    "reviewCount": 167,
+    "sellerId": "S006",
+    "delivery": "next_day",
+    "stock": 22,
+    "attributes": {
+      "setupRole": "lamp",
+      "widthCm": 15,
+      "depthCm": 15,
+      "style": ["aesthetic", "warm", "premium"]
+    },
+    "bestFor": ["Aesthetic setups", "Warmer ambient light"],
+    "tradeoffs": ["Higher price", "Slightly larger base"],
+    "compatibility": {
+      "worksWith": ["SETMON27A", "SETKEYMIN", "SETPLANT"]
+    },
+    "bundleItems": ["SETMON27A", "SETPLANT"]
+  },
+  {
+    "id": "SETSTANDALU",
+    "title": "Aluminum Laptop Stand",
+    "category": "electronics",
+    "description": "Simple laptop stand that clears desk depth and lifts the laptop into the user's peripheral view.",
+    "keywords": ["laptop stand", "coding", "desk setup", "aluminum", "student"],
+    "price": 39,
+    "rating": 4.6,
+    "reviewCount": 299,
+    "sellerId": "S004",
+    "delivery": "same_day",
+    "stock": 48,
+    "attributes": {
+      "setupRole": "laptop_stand",
+      "widthCm": 24,
+      "depthCm": 23,
+      "style": ["productivity", "compact", "budget"]
+    },
+    "bestFor": ["Student setups", "Saving desk depth"],
+    "tradeoffs": ["Plain finish", "No cable tray"],
+    "compatibility": {
+      "worksWith": ["SETMON24", "SETMON27", "SETKEYBUD"]
+    },
+    "bundleItems": ["SETMON27"]
+  },
+  {
+    "id": "SETSTANDWOOD",
+    "title": "Walnut Laptop Riser",
+    "category": "home_decor",
+    "description": "Warmer-toned laptop riser that makes a desk feel more intentional and aesthetic.",
+    "keywords": ["laptop stand", "riser", "walnut", "aesthetic", "desk setup"],
+    "price": 59,
+    "rating": 4.7,
+    "reviewCount": 129,
+    "sellerId": "S006",
+    "delivery": "standard",
+    "stock": 19,
+    "attributes": {
+      "setupRole": "laptop_stand",
+      "widthCm": 25,
+      "depthCm": 24,
+      "style": ["aesthetic", "warm", "premium"]
+    },
+    "bestFor": ["Minimal desks", "Warm material palettes"],
+    "tradeoffs": ["Costs more", "Standard delivery"],
+    "compatibility": {
+      "worksWith": ["SETMON27A", "SETKEYMIN", "SETPLANT"]
+    },
+    "bundleItems": ["SETMON27A", "SETPLANT"]
+  },
+  {
+    "id": "SETPLANT",
+    "title": "Mini Potted Plant Accent",
+    "category": "home_decor",
+    "description": "Small desk plant that makes study setups feel warmer without consuming much usable space.",
+    "keywords": ["plant", "desk plant", "aesthetic", "minimal", "desk setup"],
+    "price": 19,
+    "rating": 4.5,
+    "reviewCount": 146,
+    "sellerId": "S006",
+    "delivery": "same_day",
+    "stock": 40,
+    "attributes": {
+      "setupRole": "plant",
+      "widthCm": 12,
+      "depthCm": 12,
+      "style": ["aesthetic", "warm", "minimal"]
+    },
+    "bestFor": ["Adding warmth", "Softening minimal desks"],
+    "tradeoffs": ["Purely aesthetic", "One more object on the desk"],
+    "compatibility": {
+      "worksWith": ["SETMON27A", "SETLAMPWARM", "SETSTANDWOOD"]
+    },
+    "bundleItems": ["SETLAMPWARM"]
   }
 ]

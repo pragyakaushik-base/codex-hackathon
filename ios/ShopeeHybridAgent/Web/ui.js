@@ -38,6 +38,7 @@ const activitySteps = [
   { tool: 'analyze_surroundings', label: 'Analyzing camera view' },
   { tool: 'classify_need', label: 'Understanding your request' },
   { tool: 'search_catalog', label: 'Searching Shopee catalog' },
+  { tool: 'build_spatial_setup', label: 'Designing your AR setup' },
   { tool: 'recommend_bundle', label: 'Finding useful add-ons' },
   { tool: 'compare_products', label: 'Comparing best matches' },
   { tool: 'add_to_cart', label: 'Adding to cart' },
@@ -288,11 +289,25 @@ document.addEventListener('click', (event) => {
     return;
   }
 
+  const nativePlaceTarget = event.target.closest('[data-native-action="place"]');
+  if (nativePlaceTarget) {
+    postNative('place_recommendations');
+    return;
+  }
+
   const target = event.target.closest('[data-go], [data-open-agent]');
   if (!target) return;
   const next = target.dataset.go || 'listening';
+  if (next === 'camera') {
+    postNative('cameraTapped');
+    return;
+  }
   go(next);
 });
+
+window.syncNativeState = function syncNativeState() {
+  renderProducts();
+};
 
 async function bootstrap() {
   try {
@@ -462,6 +477,14 @@ async function handleRealtimeMessage(event) {
   const payload = JSON.parse(event.data);
   console.debug('Realtime event', payload);
 
+  if (payload.type === 'response.function_call_arguments.done') {
+    await runRealtimeTool({
+      call_id: payload.call_id,
+      name: payload.name,
+      arguments: payload.arguments
+    });
+  }
+
   if (payload.type === 'response.output_item.done' && payload.item?.type === 'function_call') {
     await runRealtimeTool(payload.item);
   }
@@ -484,35 +507,42 @@ async function handleRealtimeMessage(event) {
 }
 
 async function runRealtimeTool(functionCall) {
-  if (handledRealtimeCalls.has(functionCall.call_id)) return;
-  handledRealtimeCalls.add(functionCall.call_id);
+  const callId = functionCall.call_id || functionCall.id;
+  if (!callId || handledRealtimeCalls.has(callId)) return;
+  handledRealtimeCalls.add(callId);
 
   const args = parseArguments(functionCall.arguments);
   if (!args.userId) args.userId = 'u_001';
-  setToolActivity(functionCall.name, 'active');
-  setVoiceStatus(`Running ${functionCall.name.replaceAll('_', ' ')}...`);
+  const toolName = normalizeToolName(functionCall.name);
+  setToolActivity(toolName, 'active');
+  setVoiceStatus(`Running ${toolName.replaceAll('_', ' ')}...`);
 
-  if (functionCall.name === 'analyze_surroundings') {
+  if (toolName === 'analyze_surroundings') {
     await enrichSurroundingsArgs(args);
   }
 
   const response = await postJson('/api/realtime-tool', {
-    name: functionCall.name,
+    name: toolName,
     arguments: args
   });
 
-  setToolActivity(functionCall.name, 'done');
-  await applyToolResult(functionCall.name, response.result);
+  setToolActivity(toolName, 'done');
+  await applyToolResult(toolName, response.result);
 
   realtime.dataChannel.send(JSON.stringify({
     type: 'conversation.item.create',
     item: {
       type: 'function_call_output',
-      call_id: functionCall.call_id,
+      call_id: callId,
       output: JSON.stringify(response.result)
     }
   }));
   realtime.dataChannel.send(JSON.stringify({ type: 'response.create' }));
+}
+
+function normalizeToolName(name = '') {
+  if (name === 'analyse_surroundings') return 'analyze_surroundings';
+  return name;
 }
 
 async function applyToolResult(name, result) {
@@ -525,6 +555,17 @@ async function applyToolResult(name, result) {
   if (name === 'search_catalog') {
     products = (result.results || []).map((entry) => entry.product);
     if (products.length) go('suggestions');
+  }
+
+  if (name === 'build_spatial_setup') {
+    const setupProducts = (result.items || []).map((item) => item.product).filter(Boolean);
+    if (setupProducts.length) {
+      products = setupProducts;
+      lastBundleIds = setupProducts.map((product) => product.id);
+      setVoiceStatus(result.summary || 'Your AR setup is ready.');
+      postNative('apply_spatial_setup', { setup: result });
+      go('suggestions');
+    }
   }
 
   if (name === 'recommend_bundle') {
@@ -557,6 +598,24 @@ async function applyToolResult(name, result) {
 async function enrichSurroundingsArgs(args) {
   if (args.imageDataUrl || args.imageBase64 || args.imageUrl) return args;
 
+  setVoiceStatus('Capturing the current view...');
+  try {
+    const nativeFrame = await captureNativeSurroundings(args);
+    if (nativeFrame.imageDataUrl) {
+      args.imageDataUrl = nativeFrame.imageDataUrl;
+    }
+    if (nativeFrame.imageBase64) {
+      args.imageBase64 = nativeFrame.imageBase64;
+    }
+    if (nativeFrame.mimeType) {
+      args.mimeType = nativeFrame.mimeType;
+    }
+    setVoiceStatus('View captured. Analyzing...');
+    return args;
+  } catch (nativeError) {
+    console.warn('Native surroundings capture unavailable', nativeError);
+  }
+
   setVoiceStatus('Opening camera for a quick look...');
   try {
     const frame = await captureCameraFrame();
@@ -570,6 +629,34 @@ async function enrichSurroundingsArgs(args) {
   }
 
   return args;
+}
+
+async function captureNativeSurroundings(args = {}) {
+  if (typeof window.captureNativeCameraView !== 'function') {
+    throw new Error('native camera bridge is unavailable.');
+  }
+
+  const payload = await withTimeout(
+    window.captureNativeCameraView({
+      question: args.question || args.userText || ''
+    }),
+    6000,
+    'native camera capture timed out.'
+  );
+
+  if (!payload || (!payload.imageDataUrl && !payload.imageBase64)) {
+    throw new Error('native camera bridge returned no image.');
+  }
+
+  return payload;
+}
+
+function withTimeout(promise, timeoutMs, message) {
+  let timeoutId = null;
+  const timeout = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(message)), timeoutMs);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
 }
 
 async function captureCameraFrame() {
