@@ -905,7 +905,7 @@ export function getToolDefinitions() {
     {
       type: "function",
       name: "analyze_surroundings",
-      description: "Analyze the user's camera snapshot or visual context and return structured shopping clues before catalog search.",
+      description: "Analyze the user's current camera view or surroundings. The client captures and passes an image automatically, so use this for prompts like 'what am I looking at?' or 'analyze my surroundings' before catalog search.",
       parameters: {
         type: "object",
         properties: {

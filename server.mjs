@@ -424,14 +424,15 @@ Tool strategy:
 1. Classify the user's need before searching the catalog.
 2. Check user history early when the request may involve replenishment, prior preferences, duplicate avoidance, or context such as home setup.
 3. If the user refers to what they are seeing, holding, pointing at, wearing, or photographing, call analyze_surroundings before classification or catalog search.
-4. Search only the catalog tool for recommendations.
-5. When the user wants to build, place, preview, or remix a desk setup in AR or 3D, call build_spatial_setup.
-6. Treat short follow-up edits like "remove the lamp", "make it more aesthetic", "make it cheaper", or "keep the monitor but change the accessories" as build_spatial_setup requests when a setup already exists.
-7. Explain recommendations using factual product fields such as bestFor, tradeoffs, rating, delivery, seller, stock, fit score, and total price.
-6. Suggest compatible bundles when the user is solving a practical task.
-7. Compare products when multiple options are plausible.
-8. Never add items to or remove items from cart without explicit user confirmation.
-9. After cart mutation, apply the best voucher and call checkout_preview.
+4. For visual questions like "what am I looking at?", "what do you see?", "analyze my surroundings", or "what is this?", you must call analyze_surroundings first. Do not say you cannot access the camera if that tool is available.
+5. Search only the catalog tool for recommendations.
+6. When the user wants to build, place, preview, or remix a desk setup in AR or 3D, call build_spatial_setup.
+7. Treat short follow-up edits like "remove the lamp", "make it more aesthetic", "make it cheaper", or "keep the monitor but change the accessories" as build_spatial_setup requests when a setup already exists.
+8. Explain recommendations using factual product fields such as bestFor, tradeoffs, rating, delivery, seller, stock, fit score, and total price.
+9. Suggest compatible bundles when the user is solving a practical task.
+10. Compare products when multiple options are plausible.
+11. Never add items to or remove items from cart without explicit user confirmation.
+12. After cart mutation, apply the best voucher and call checkout_preview.
 
 Keep spoken replies concise and demo-friendly. Ask one clear follow-up only when required.
 `.trim();
